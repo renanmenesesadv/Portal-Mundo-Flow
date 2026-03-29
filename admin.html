@@ -48,7 +48,46 @@
         .char-count{font-size:.7rem;color:var(--text-muted);text-align:right;margin-top:2px}
         .admin-login{max-width:400px;margin:100px auto;text-align:center}
         .admin-login h2{margin-bottom:20px}
-        @media(max-width:768px){.form-row,.form-row-3{grid-template-columns:1fr}}
+        .automation-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px}
+        .auto-header{display:flex;justify-content:space-between;align-items:center}
+        .auto-title{font-size:1.1rem;font-weight:700;color:var(--text);margin:0}
+        .auto-desc{font-size:.8rem;color:var(--text-muted);margin:4px 0 0}
+        .auto-toggle{display:flex;align-items:center;gap:10px}
+        .auto-label{font-size:.85rem;font-weight:700;color:var(--text-muted)}
+        .auto-label.active{color:var(--success)}
+        .switch{position:relative;display:inline-block;width:50px;height:26px}
+        .switch input{opacity:0;width:0;height:0}
+        .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--border);border-radius:26px;transition:.3s}
+        .slider:before{content:"";position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+        .switch input:checked+.slider{background:var(--success)}
+        .switch input:checked+.slider:before{transform:translateX(24px)}
+        .auto-actions{display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap}
+        .auto-btn{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:var(--radius);font-size:.8rem;font-weight:600;cursor:pointer}
+        .auto-btn:hover{opacity:.85}
+        .auto-btn.secondary{background:var(--primary-light);color:var(--text);border:1px solid var(--border)}
+        .auto-btn:disabled{opacity:.5;cursor:not-allowed}
+        .auto-stats{font-size:.75rem;color:var(--text-muted);margin-left:auto}
+        .articles-manager{margin-top:32px;border-top:2px solid var(--border);padding-top:24px}
+        .manager-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+        .manager-filter{display:flex;gap:8px;margin-bottom:12px}
+        .manager-filter input,.manager-filter select{padding:8px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);color:var(--text);font-size:.85rem}
+        .manager-filter input{flex:1}
+        .articles-list{max-height:600px;overflow-y:auto}
+        .article-row{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;background:var(--bg-card);transition:all .2s}
+        .article-row:hover{border-color:var(--accent)}
+        .article-row .row-img{width:60px;height:40px;border-radius:4px;object-fit:cover;background:var(--primary-light);flex-shrink:0}
+        .article-row .row-info{flex:1;min-width:0}
+        .article-row .row-title{font-size:.85rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .article-row .row-meta{font-size:.7rem;color:var(--text-muted);margin-top:2px}
+        .article-row .row-actions{display:flex;gap:4px;flex-shrink:0}
+        .article-row .row-actions button{padding:4px 10px;border:1px solid var(--border);border-radius:4px;font-size:.7rem;cursor:pointer;background:var(--bg-card);color:var(--text)}
+        .article-row .row-actions button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+        .article-row .row-actions button.delete:hover{background:#e53e3e}
+        .edit-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
+        .edit-modal-content{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto}
+        .edit-modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+        .edit-modal-header h3{font-size:1.2rem;color:var(--accent)}
+        @media(max-width:768px){.form-row,.form-row-3{grid-template-columns:1fr}.auto-header{flex-direction:column;gap:12px;align-items:flex-start}.manager-filter{flex-direction:column}.article-row{flex-direction:column;align-items:flex-start}}
     </style>
 </head>
 <body>
@@ -64,15 +103,42 @@
     <div id="loginScreen" class="admin-container admin-login">
         <h2>Acesso Restrito</h2>
         <div class="form-group">
-            <label>Token GitHub (Personal Access Token)</label>
+            <label>Token GitHub</label>
             <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
         </div>
+        <div class="form-group">
+            <label>API Key n8n (para automacao)</label>
+            <input type="password" id="n8nApiKey" placeholder="Opcional - para ativar/desativar automacao">
+        </div>
         <button class="btn-publish" onclick="doLogin()">Entrar</button>
-        <p style="margin-top:12px;font-size:.75rem;color:var(--text-muted)">O token fica salvo apenas no seu navegador (localStorage)</p>
+        <p style="margin-top:12px;font-size:.75rem;color:var(--text-muted)">Tokens ficam salvos no navegador (localStorage)</p>
     </div>
 
     <!-- Editor -->
     <div id="editorScreen" class="admin-container" style="display:none">
+
+        <!-- Painel de Automacao -->
+        <div class="automation-panel" id="automationPanel">
+            <div class="auto-header">
+                <div>
+                    <h2 class="auto-title">Automacao de Noticias</h2>
+                    <p class="auto-desc" id="autoDesc">Carregando status...</p>
+                </div>
+                <div class="auto-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="autoToggle" onchange="toggleAutomation()">
+                        <span class="slider"></span>
+                    </label>
+                    <span id="autoLabel" class="auto-label">OFF</span>
+                </div>
+            </div>
+            <div class="auto-actions">
+                <button class="auto-btn" onclick="runWorkflowNow()">Executar agora</button>
+                <button class="auto-btn secondary" onclick="checkWorkflowStatus()">Atualizar status</button>
+                <span class="auto-stats" id="autoStats"></span>
+            </div>
+        </div>
+
         <h1 class="admin-title">Novo Artigo</h1>
 
         <div class="form-group">
@@ -170,13 +236,85 @@
             <h3>Pre-visualizacao</h3>
             <div id="previewContent" class="article-body"></div>
         </div>
+
+        <!-- Gestao de Artigos -->
+        <div class="articles-manager" id="articlesManager">
+            <div class="manager-header">
+                <h2 class="admin-title" style="margin-bottom:0">Artigos Publicados</h2>
+                <button class="auto-btn secondary" onclick="loadArticlesList()">Atualizar lista</button>
+            </div>
+            <div class="manager-filter">
+                <input type="text" id="filterSearch" placeholder="Buscar artigos..." oninput="filterArticles()">
+                <select id="filterCategory" onchange="filterArticles()">
+                    <option value="">Todas categorias</option>
+                    <option value="politica">Politica</option>
+                    <option value="economia">Economia</option>
+                    <option value="tecnologia">Tecnologia</option>
+                    <option value="seguranca">Seguranca</option>
+                    <option value="internacional">Internacional</option>
+                    <option value="negocios">Negocios</option>
+                    <option value="geral">Geral</option>
+                </select>
+            </div>
+            <div id="articlesList" class="articles-list">
+                <p style="color:var(--text-muted);text-align:center;padding:20px">Clique em "Atualizar lista" para carregar</p>
+            </div>
+        </div>
+
+        <!-- Modal de Edicao -->
+        <div class="edit-modal" id="editModal" style="display:none">
+            <div class="edit-modal-content">
+                <div class="edit-modal-header">
+                    <h3>Editar Artigo</h3>
+                    <button onclick="closeEditModal()" style="background:none;border:none;color:var(--text);font-size:1.5rem;cursor:pointer">&times;</button>
+                </div>
+                <div class="form-group">
+                    <label>Titulo</label>
+                    <input type="text" id="editTitle">
+                </div>
+                <div class="form-group">
+                    <label>Resumo</label>
+                    <input type="text" id="editExcerpt">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Categoria</label>
+                        <select id="editCategory">
+                            <option value="politica">Politica</option>
+                            <option value="economia">Economia</option>
+                            <option value="tecnologia">Tecnologia</option>
+                            <option value="seguranca">Seguranca</option>
+                            <option value="internacional">Internacional</option>
+                            <option value="negocios">Negocios</option>
+                            <option value="geral">Geral</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Autor</label>
+                        <select id="editAuthor">
+                            <option value="Renan Meneses">Renan Meneses</option>
+                            <option value="Ana Claudia Dantas">Ana Claudia Dantas</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Conteudo (HTML)</label>
+                    <div class="editor-area" id="editBody" contenteditable="true" style="min-height:200px"></div>
+                </div>
+                <button class="btn-publish" onclick="saveEditedArticle()">Salvar Alteracoes</button>
+                <div class="status-msg" id="editStatus"></div>
+            </div>
+        </div>
     </div>
 
     <script>
     // ===== Config =====
     const REPO_OWNER = 'renanmenesesadv';
     const REPO_NAME = 'Portal-Mundo-Flow';
+    const N8N_BASE = 'https://renanmenesesadv.app.n8n.cloud';
+    const WORKFLOW_ID = 'b8gQZOtuCyIaLCnD';
     let githubToken = '';
+    let n8nApiKey = '';
     let tags = [];
     let imageBase64 = '';
     let imageName = '';
@@ -187,16 +325,28 @@
         if (!token) return;
         githubToken = token;
         localStorage.setItem('mf_token', token);
+
+        const n8nKey = document.getElementById('n8nApiKey')?.value?.trim();
+        if (n8nKey) {
+            n8nApiKey = n8nKey;
+            localStorage.setItem('mf_n8n_key', n8nKey);
+        }
+
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('editorScreen').style.display = 'block';
+        checkWorkflowStatus();
     }
 
     // Auto-login
     const saved = localStorage.getItem('mf_token');
+    const savedN8n = localStorage.getItem('mf_n8n_key');
     if (saved) {
         githubToken = saved;
+        if (savedN8n) n8nApiKey = savedN8n;
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('editorScreen').style.display = 'block';
+        checkWorkflowStatus();
+        loadArticlesList();
     }
 
     // ===== Char count =====
@@ -413,6 +563,232 @@
         const el = document.getElementById('statusMsg');
         el.textContent = msg;
         el.className = 'status-msg ' + type;
+    }
+
+    // ===== n8n Automation =====
+    async function n8nFetch(path, method, body) {
+        if (!n8nApiKey) return null;
+        const opts = {
+            method: method || 'GET',
+            headers: { 'X-N8N-API-KEY': n8nApiKey, 'Accept': 'application/json' }
+        };
+        if (body) { opts.body = JSON.stringify(body); opts.headers['Content-Type'] = 'application/json'; }
+        try {
+            const r = await fetch(N8N_BASE + '/api/v1' + path, opts);
+            return r.ok ? r.json() : null;
+        } catch(e) { return null; }
+    }
+
+    async function checkWorkflowStatus() {
+        const desc = document.getElementById('autoDesc');
+        const toggle = document.getElementById('autoToggle');
+        const label = document.getElementById('autoLabel');
+        const stats = document.getElementById('autoStats');
+
+        if (!n8nApiKey) {
+            desc.textContent = 'Insira a API Key do n8n para controlar a automacao';
+            toggle.disabled = true;
+            return;
+        }
+
+        const wf = await n8nFetch('/workflows/' + WORKFLOW_ID);
+        if (!wf) {
+            desc.textContent = 'Nao foi possivel conectar ao n8n';
+            return;
+        }
+
+        const active = wf.active;
+        toggle.checked = active;
+        label.textContent = active ? 'ON' : 'OFF';
+        label.className = 'auto-label' + (active ? ' active' : '');
+        desc.textContent = active ? 'Publicando 2 artigos a cada 30min (6h-0h)' : 'Automacao pausada - artigos so via publicacao manual';
+
+        // Stats
+        const execs = await n8nFetch('/executions?workflowId=' + WORKFLOW_ID + '&limit=5');
+        if (execs && execs.data) {
+            const ok = execs.data.filter(e => e.status === 'success').length;
+            const last = execs.data[0];
+            const lastTime = last ? new Date(last.startedAt).toLocaleString('pt-BR') : '-';
+            stats.textContent = ok + '/5 ultimas OK | Ultima: ' + lastTime;
+        }
+    }
+
+    async function toggleAutomation() {
+        const toggle = document.getElementById('autoToggle');
+        const active = toggle.checked;
+
+        const result = await n8nFetch('/workflows/' + WORKFLOW_ID, 'PATCH', { active });
+        if (result) {
+            checkWorkflowStatus();
+        } else {
+            toggle.checked = !active;
+            alert('Erro ao alterar automacao. Verifique a API Key do n8n.');
+        }
+    }
+
+    async function runWorkflowNow() {
+        const btn = event.target;
+        btn.disabled = true;
+        btn.textContent = 'Executando...';
+
+        const result = await n8nFetch('/workflows/' + WORKFLOW_ID + '/run', 'POST', {});
+        if (result) {
+            btn.textContent = 'Executado!';
+            setTimeout(() => { btn.textContent = 'Executar agora'; btn.disabled = false; }, 3000);
+        } else {
+            btn.textContent = 'Erro';
+            setTimeout(() => { btn.textContent = 'Executar agora'; btn.disabled = false; }, 2000);
+        }
+    }
+
+    // ===== Articles Manager =====
+    let allArticlesData = [];
+    let articlesFileSha = '';
+    let editingIndex = -1;
+
+    async function loadArticlesList() {
+        const list = document.getElementById('articlesList');
+        list.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px">Carregando...</p>';
+
+        try {
+            const file = await githubGetFile('data/articles.json');
+            articlesFileSha = file.sha;
+            allArticlesData = JSON.parse(atob(file.content.replace(/\n/g, '')));
+            renderArticlesList(allArticlesData);
+        } catch(e) {
+            list.innerHTML = '<p style="color:var(--accent);text-align:center;padding:20px">Erro ao carregar artigos</p>';
+        }
+    }
+
+    function renderArticlesList(articles) {
+        const list = document.getElementById('articlesList');
+        if (!articles.length) {
+            list.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px">Nenhum artigo encontrado</p>';
+            return;
+        }
+
+        list.innerHTML = articles.map((a, i) => {
+            const date = a.date ? new Date(a.date).toLocaleDateString('pt-BR') : '-';
+            const imgHtml = a.image ? '<img class="row-img" src="' + a.image + '" alt="">' : '<div class="row-img" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--accent)">&#128240;</div>';
+            const realIdx = allArticlesData.indexOf(a);
+
+            return '<div class="article-row">' +
+                imgHtml +
+                '<div class="row-info">' +
+                    '<div class="row-title">' + (a.title || 'Sem titulo') + '</div>' +
+                    '<div class="row-meta">' + date + ' | ' + (a.category || 'geral') + ' | ' + (a.author || '?') + ' | ' + (a.source || '') + '</div>' +
+                '</div>' +
+                '<div class="row-actions">' +
+                    '<button onclick="viewArticle(\'' + (a.slug || '') + '\')">Ver</button>' +
+                    '<button onclick="editArticle(' + realIdx + ')">Editar</button>' +
+                    '<button class="delete" onclick="deleteArticle(' + realIdx + ')">Excluir</button>' +
+                '</div>' +
+            '</div>';
+        }).join('');
+    }
+
+    function filterArticles() {
+        const search = document.getElementById('filterSearch').value.toLowerCase();
+        const cat = document.getElementById('filterCategory').value;
+
+        const filtered = allArticlesData.filter(a => {
+            const matchSearch = !search || (a.title || '').toLowerCase().includes(search) || (a.excerpt || '').toLowerCase().includes(search);
+            const matchCat = !cat || a.category === cat;
+            return matchSearch && matchCat;
+        });
+
+        renderArticlesList(filtered);
+    }
+
+    function viewArticle(slug) {
+        if (slug) window.open('artigo.html?id=' + slug, '_blank');
+    }
+
+    function editArticle(idx) {
+        editingIndex = idx;
+        const a = allArticlesData[idx];
+        if (!a) return;
+
+        document.getElementById('editTitle').value = a.title || '';
+        document.getElementById('editExcerpt').value = a.excerpt || '';
+        document.getElementById('editCategory').value = a.category || 'geral';
+        document.getElementById('editAuthor').value = a.author || 'Renan Meneses';
+
+        // Remove figure and attribution from body for editing
+        let body = a.body || '';
+        body = body.replace(/<figure>.*?<\/figure>/s, '');
+        body = body.replace(/<p class="article-attribution">.*?<\/p>/s, '');
+        document.getElementById('editBody').innerHTML = body.trim();
+
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+        editingIndex = -1;
+    }
+
+    async function saveEditedArticle() {
+        if (editingIndex < 0) return;
+        const statusEl = document.getElementById('editStatus');
+
+        const a = allArticlesData[editingIndex];
+        a.title = document.getElementById('editTitle').value.trim();
+        a.excerpt = document.getElementById('editExcerpt').value.trim();
+        a.category = document.getElementById('editCategory').value;
+        a.author = document.getElementById('editAuthor').value;
+        a.dateModified = new Date().toISOString();
+
+        // Rebuild body with figure and attribution
+        let body = document.getElementById('editBody').innerHTML.trim();
+        if (a.image && a.imageCredit) {
+            body = '<figure><img src="' + a.image + '" alt="' + a.title.replace(/"/g, '') + '" loading="lazy"><figcaption>' + a.imageCredit + '</figcaption></figure>' + body;
+        }
+        body += '<p class="article-attribution"><em>Por ' + a.author + ' | Com informacoes de ' + (a.source || 'equipe editorial') + '.</em></p>';
+        a.body = body;
+
+        statusEl.textContent = 'Salvando...';
+        statusEl.className = 'status-msg loading';
+
+        try {
+            const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(allArticlesData, null, 2))));
+            await githubPut('data/articles.json', newContent, 'Editar: ' + a.title.substring(0, 50), articlesFileSha);
+
+            // Update sha
+            const file = await githubGetFile('data/articles.json');
+            articlesFileSha = file.sha;
+
+            statusEl.textContent = 'Artigo atualizado!';
+            statusEl.className = 'status-msg success';
+            renderArticlesList(allArticlesData);
+
+            setTimeout(() => closeEditModal(), 1500);
+        } catch(e) {
+            statusEl.textContent = 'Erro: ' + e.message;
+            statusEl.className = 'status-msg error';
+        }
+    }
+
+    async function deleteArticle(idx) {
+        const a = allArticlesData[idx];
+        if (!a) return;
+        if (!confirm('Excluir "' + a.title + '"?\n\nEsta acao nao pode ser desfeita.')) return;
+
+        allArticlesData.splice(idx, 1);
+
+        try {
+            const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(allArticlesData, null, 2))));
+            await githubPut('data/articles.json', newContent, 'Excluir: ' + a.title.substring(0, 50), articlesFileSha);
+
+            const file = await githubGetFile('data/articles.json');
+            articlesFileSha = file.sha;
+
+            renderArticlesList(allArticlesData);
+            showStatus('Artigo excluido', 'success');
+        } catch(e) {
+            showStatus('Erro ao excluir: ' + e.message, 'error');
+            loadArticlesList(); // Reload to restore
+        }
     }
     </script>
 </body>
