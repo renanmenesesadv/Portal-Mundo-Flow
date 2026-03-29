@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin - Mundo em Foco</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <style>
+        .admin-container{max-width:900px;margin:0 auto;padding:20px}
+        .admin-title{font-size:1.5rem;font-weight:700;margin-bottom:24px;color:var(--accent)}
+        .form-group{margin-bottom:16px}
+        .form-group label{display:block;font-size:.85rem;font-weight:600;margin-bottom:6px;color:var(--text)}
+        .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);color:var(--text);font-size:.9rem;font-family:inherit}
+        .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--accent)}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+        .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+        .editor-toolbar{display:flex;gap:4px;padding:8px;background:var(--primary-light);border:1px solid var(--border);border-bottom:none;border-radius:var(--radius) var(--radius) 0 0;flex-wrap:wrap}
+        .editor-toolbar button{background:var(--bg-card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:4px;cursor:pointer;font-size:.8rem;font-weight:600}
+        .editor-toolbar button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+        .editor-area{min-height:350px;padding:16px;border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);background:var(--bg-card);color:var(--text);font-family:var(--font-serif);font-size:1rem;line-height:1.8;overflow-y:auto}
+        .editor-area:focus{outline:none;border-color:var(--accent)}
+        .editor-area h2{font-family:var(--font-sans);font-size:1.3rem;font-weight:700;margin:16px 0 8px;color:var(--text)}
+        .editor-area h3{font-family:var(--font-sans);font-size:1.1rem;font-weight:600;margin:12px 0 6px}
+        .editor-area p{margin-bottom:12px}
+        .editor-area blockquote{border-left:3px solid var(--accent);padding:8px 16px;margin:12px 0;background:rgba(233,69,96,.05)}
+        .image-upload{border:2px dashed var(--border);border-radius:var(--radius);padding:24px;text-align:center;cursor:pointer;transition:all .2s}
+        .image-upload:hover{border-color:var(--accent);background:rgba(233,69,96,.05)}
+        .image-upload.has-image{border-style:solid;border-color:var(--accent)}
+        .image-upload img{max-width:100%;max-height:300px;border-radius:var(--radius);margin-top:12px}
+        .image-upload input[type="file"]{display:none}
+        .image-upload p{color:var(--text-muted);font-size:.85rem;margin:0}
+        .btn-publish{background:var(--accent);color:#fff;border:none;padding:14px 40px;border-radius:var(--radius);font-size:1rem;font-weight:700;cursor:pointer;width:100%;margin-top:20px;transition:all .2s}
+        .btn-publish:hover{opacity:.9;transform:scale(1.01)}
+        .btn-publish:disabled{opacity:.5;cursor:not-allowed}
+        .btn-secondary{background:var(--primary-light);color:var(--text);border:1px solid var(--border);padding:14px 40px;border-radius:var(--radius);font-size:1rem;font-weight:600;cursor:pointer;width:100%;margin-top:8px}
+        .status-msg{padding:12px;border-radius:var(--radius);margin-top:12px;font-size:.9rem;display:none}
+        .status-msg.success{display:block;background:rgba(0,212,170,.15);color:#00d4aa;border:1px solid rgba(0,212,170,.3)}
+        .status-msg.error{display:block;background:rgba(233,69,96,.15);color:var(--accent);border:1px solid rgba(233,69,96,.3)}
+        .status-msg.loading{display:block;background:rgba(255,167,38,.15);color:var(--warning);border:1px solid rgba(255,167,38,.3)}
+        .preview-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-top:20px}
+        .preview-panel h3{font-size:1rem;margin-bottom:12px;color:var(--accent)}
+        .tags-input{display:flex;flex-wrap:wrap;gap:6px;padding:8px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);min-height:40px;align-items:center}
+        .tags-input .tag{background:var(--accent);color:#fff;padding:3px 10px;border-radius:12px;font-size:.75rem;display:flex;align-items:center;gap:4px}
+        .tags-input .tag button{background:none;border:none;color:#fff;cursor:pointer;font-size:.9rem;padding:0}
+        .tags-input input{border:none;background:none;color:var(--text);font-size:.85rem;flex:1;min-width:100px;outline:none}
+        .char-count{font-size:.7rem;color:var(--text-muted);text-align:right;margin-top:2px}
+        .admin-login{max-width:400px;margin:100px auto;text-align:center}
+        .admin-login h2{margin-bottom:20px}
+        @media(max-width:768px){.form-row,.form-row-3{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="header-top">
+                <a href="index.html" class="logo"><h1>Mundo em Foco</h1><span class="tagline">Painel Administrativo</span></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Login -->
+    <div id="loginScreen" class="admin-container admin-login">
+        <h2>Acesso Restrito</h2>
+        <div class="form-group">
+            <label>Token GitHub (Personal Access Token)</label>
+            <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
+        </div>
+        <button class="btn-publish" onclick="doLogin()">Entrar</button>
+        <p style="margin-top:12px;font-size:.75rem;color:var(--text-muted)">O token fica salvo apenas no seu navegador (localStorage)</p>
+    </div>
+
+    <!-- Editor -->
+    <div id="editorScreen" class="admin-container" style="display:none">
+        <h1 class="admin-title">Novo Artigo</h1>
+
+        <div class="form-group">
+            <label>Titulo</label>
+            <input type="text" id="articleTitle" placeholder="Titulo SEO atraente (55-65 caracteres)" maxlength="80" oninput="updateCharCount(this,'titleCount',65)">
+            <div class="char-count" id="titleCount">0/65</div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Categoria</label>
+                <select id="articleCategory">
+                    <option value="politica">Politica</option>
+                    <option value="economia">Economia</option>
+                    <option value="tecnologia">Tecnologia</option>
+                    <option value="seguranca">Seguranca</option>
+                    <option value="internacional" selected>Internacional</option>
+                    <option value="negocios">Negocios</option>
+                    <option value="geral">Geral</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Autor</label>
+                <select id="articleAuthor">
+                    <option value="Renan Meneses">Renan Meneses</option>
+                    <option value="Ana Claudia Dantas">Ana Claudia Dantas</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Resumo (excerpt)</label>
+            <input type="text" id="articleExcerpt" placeholder="Resumo provocativo (140-155 caracteres)" maxlength="160" oninput="updateCharCount(this,'excerptCount',155)">
+            <div class="char-count" id="excerptCount">0/155</div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Fonte</label>
+                <input type="text" id="articleSource" placeholder="Ex: BBC Brasil, InfoMoney">
+            </div>
+            <div class="form-group">
+                <label>Link da fonte</label>
+                <input type="url" id="articleSourceUrl" placeholder="https://...">
+            </div>
+        </div>
+
+        <!-- Imagem -->
+        <div class="form-group">
+            <label>Imagem de Capa</label>
+            <div class="image-upload" id="imageUpload" onclick="document.getElementById('imageFile').click()">
+                <input type="file" id="imageFile" accept="image/*" onchange="handleImageUpload(this)">
+                <p id="imageLabel">Clique para carregar imagem (JPG, PNG, WebP)</p>
+                <img id="imagePreview" style="display:none">
+            </div>
+            <input type="text" id="imageCredit" placeholder="Credito da imagem (ex: Foto: Reuters)" style="margin-top:8px">
+        </div>
+
+        <!-- Tags -->
+        <div class="form-group">
+            <label>Tags (pressione Enter para adicionar)</label>
+            <div class="tags-input" id="tagsContainer" onclick="document.getElementById('tagInput').focus()">
+                <input type="text" id="tagInput" placeholder="Adicionar tag..." onkeydown="handleTag(event)">
+            </div>
+        </div>
+
+        <!-- Editor de Texto -->
+        <div class="form-group">
+            <label>Conteudo do Artigo</label>
+            <div class="editor-toolbar">
+                <button onclick="execCmd('bold')" title="Negrito"><b>B</b></button>
+                <button onclick="execCmd('italic')" title="Italico"><i>I</i></button>
+                <button onclick="execCmd('underline')" title="Sublinhado"><u>U</u></button>
+                <button onclick="insertHeading('h2')" title="Subtitulo H2">H2</button>
+                <button onclick="insertHeading('h3')" title="Subtitulo H3">H3</button>
+                <button onclick="execCmd('insertUnorderedList')" title="Lista">Lista</button>
+                <button onclick="execCmd('insertOrderedList')" title="Lista numerada">1. Lista</button>
+                <button onclick="insertBlockquote()" title="Citacao">Citacao</button>
+                <button onclick="insertLink()" title="Link">Link</button>
+                <button onclick="clearFormat()" title="Limpar formatacao">Limpar</button>
+            </div>
+            <div class="editor-area" id="editorArea" contenteditable="true">
+                <h2>Subtitulo aqui</h2>
+                <p>Escreva o conteudo do artigo...</p>
+            </div>
+        </div>
+
+        <button class="btn-publish" id="publishBtn" onclick="publishArticle()">Publicar Artigo</button>
+        <button class="btn-secondary" onclick="previewArticle()">Pre-visualizar</button>
+
+        <div class="status-msg" id="statusMsg"></div>
+
+        <!-- Preview -->
+        <div class="preview-panel" id="previewPanel" style="display:none">
+            <h3>Pre-visualizacao</h3>
+            <div id="previewContent" class="article-body"></div>
+        </div>
+    </div>
+
+    <script>
+    // ===== Config =====
+    const REPO_OWNER = 'renanmenesesadv';
+    const REPO_NAME = 'Portal-Mundo-Flow';
+    let githubToken = '';
+    let tags = [];
+    let imageBase64 = '';
+    let imageName = '';
+
+    // ===== Login =====
+    function doLogin() {
+        const token = document.getElementById('githubToken').value.trim();
+        if (!token) return;
+        githubToken = token;
+        localStorage.setItem('mf_token', token);
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('editorScreen').style.display = 'block';
+    }
+
+    // Auto-login
+    const saved = localStorage.getItem('mf_token');
+    if (saved) {
+        githubToken = saved;
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('editorScreen').style.display = 'block';
+    }
+
+    // ===== Char count =====
+    function updateCharCount(input, countId, target) {
+        const el = document.getElementById(countId);
+        const len = input.value.length;
+        el.textContent = len + '/' + target;
+        el.style.color = len > target ? 'var(--accent)' : 'var(--text-muted)';
+    }
+
+    // ===== Tags =====
+    function handleTag(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const val = e.target.value.trim();
+            if (val && !tags.includes(val) && tags.length < 8) {
+                tags.push(val);
+                renderTags();
+            }
+            e.target.value = '';
+        }
+    }
+
+    function removeTag(idx) {
+        tags.splice(idx, 1);
+        renderTags();
+    }
+
+    function renderTags() {
+        const container = document.getElementById('tagsContainer');
+        const input = document.getElementById('tagInput');
+        container.innerHTML = '';
+        tags.forEach((t, i) => {
+            const span = document.createElement('span');
+            span.className = 'tag';
+            span.innerHTML = t + ' <button onclick="removeTag(' + i + ')">x</button>';
+            container.appendChild(span);
+        });
+        container.appendChild(input);
+    }
+
+    // ===== Image Upload =====
+    function handleImageUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64Full = e.target.result;
+            imageBase64 = base64Full.split(',')[1]; // Remove data:image/...;base64,
+            imageName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-').toLowerCase();
+
+            document.getElementById('imagePreview').src = base64Full;
+            document.getElementById('imagePreview').style.display = 'block';
+            document.getElementById('imageLabel').textContent = file.name + ' (' + Math.round(file.size/1024) + ' KB)';
+            document.getElementById('imageUpload').classList.add('has-image');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // ===== Editor =====
+    function execCmd(cmd) {
+        document.execCommand(cmd, false, null);
+        document.getElementById('editorArea').focus();
+    }
+
+    function insertHeading(tag) {
+        document.execCommand('formatBlock', false, tag);
+        document.getElementById('editorArea').focus();
+    }
+
+    function insertBlockquote() {
+        document.execCommand('formatBlock', false, 'blockquote');
+        document.getElementById('editorArea').focus();
+    }
+
+    function insertLink() {
+        const url = prompt('URL do link:');
+        if (url) document.execCommand('createLink', false, url);
+    }
+
+    function clearFormat() {
+        document.execCommand('removeFormat', false, null);
+        document.getElementById('editorArea').focus();
+    }
+
+    // ===== Preview =====
+    function previewArticle() {
+        const panel = document.getElementById('previewPanel');
+        const content = document.getElementById('previewContent');
+        const body = document.getElementById('editorArea').innerHTML;
+        const title = document.getElementById('articleTitle').value;
+        const author = document.getElementById('articleAuthor').value;
+
+        let html = '<h1 style="font-size:1.5rem;margin-bottom:12px">' + title + '</h1>';
+        html += '<p style="color:var(--text-muted);font-size:.85rem;margin-bottom:16px">Por ' + author + '</p>';
+        if (imageBase64) {
+            html += '<figure><img src="data:image/png;base64,' + imageBase64 + '" style="max-width:100%;border-radius:8px"><figcaption>' + (document.getElementById('imageCredit').value || '') + '</figcaption></figure>';
+        }
+        html += body;
+
+        content.innerHTML = html;
+        panel.style.display = 'block';
+        panel.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ===== Publish =====
+    async function publishArticle() {
+        const btn = document.getElementById('publishBtn');
+        const status = document.getElementById('statusMsg');
+
+        const title = document.getElementById('articleTitle').value.trim();
+        const excerpt = document.getElementById('articleExcerpt').value.trim();
+        const category = document.getElementById('articleCategory').value;
+        const author = document.getElementById('articleAuthor').value;
+        const source = document.getElementById('articleSource').value.trim();
+        const sourceUrl = document.getElementById('articleSourceUrl').value.trim();
+        const body = document.getElementById('editorArea').innerHTML;
+        const imageCredit = document.getElementById('imageCredit').value.trim();
+
+        if (!title) { showStatus('Preencha o titulo', 'error'); return; }
+        if (!body || body.length < 50) { showStatus('Conteudo muito curto', 'error'); return; }
+
+        btn.disabled = true;
+        showStatus('Publicando...', 'loading');
+
+        try {
+            // 1. Upload image if exists
+            let imageUrl = '';
+            if (imageBase64) {
+                const imgSlug = generateSlug(title) + '-' + Date.now().toString(36) + '.png';
+                const imgPath = 'img/articles/' + imgSlug;
+
+                await githubPut(imgPath, imageBase64, 'img: ' + imgSlug);
+                imageUrl = 'https://raw.githubusercontent.com/' + REPO_OWNER + '/' + REPO_NAME + '/main/' + imgPath;
+                showStatus('Imagem enviada, salvando artigo...', 'loading');
+            }
+
+            // 2. Get existing articles
+            const existing = await githubGetFile('data/articles.json');
+            let articles = [];
+            try { articles = JSON.parse(atob(existing.content.replace(/\n/g, ''))); } catch(e) { articles = []; }
+
+            // 3. Build article
+            const now = new Date().toISOString();
+            const slug = generateSlug(title) + '-' + Date.now().toString(36);
+
+            let fullBody = body;
+            if (imageUrl && imageCredit) {
+                fullBody = '<figure><img src="' + imageUrl + '" alt="' + title.replace(/"/g, '') + '" loading="lazy"><figcaption>' + imageCredit + '</figcaption></figure>' + fullBody;
+            }
+            fullBody += '<p class="article-attribution"><em>Por ' + author + ' | Com informacoes de ' + (source || 'equipe editorial') + '.</em></p>';
+
+            const article = {
+                title, slug, excerpt, body: fullBody, category,
+                tags: tags.length > 0 ? tags : [category],
+                source: source || 'Mundo em Foco',
+                sourceUrl: sourceUrl || '',
+                author, date: now, dateModified: now,
+                readTime: Math.max(2, Math.ceil(fullBody.replace(/<[^>]*>/g, '').split(/\s+/).length / 200)) + ' min',
+                image: imageUrl, imageCredit
+            };
+
+            // 4. Add to beginning and save
+            articles.unshift(article);
+            if (articles.length > 300) articles = articles.slice(0, 300);
+
+            const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(articles, null, 2))));
+            await githubPut('data/articles.json', newContent, 'Publicar: ' + title.substring(0, 50), existing.sha);
+
+            showStatus('Artigo publicado com sucesso! Aguarde 1-2 min para aparecer no site.', 'success');
+            btn.disabled = false;
+
+        } catch (err) {
+            showStatus('Erro: ' + err.message, 'error');
+            btn.disabled = false;
+        }
+    }
+
+    // ===== GitHub API =====
+    async function githubGetFile(path) {
+        const resp = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + path, {
+            headers: { 'Authorization': 'token ' + githubToken, 'Accept': 'application/vnd.github+json' }
+        });
+        if (!resp.ok) throw new Error('Falha ao ler ' + path);
+        return resp.json();
+    }
+
+    async function githubPut(path, content, message, sha) {
+        const body = { message, content };
+        if (sha) body.sha = sha;
+
+        const resp = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + path, {
+            method: 'PUT',
+            headers: { 'Authorization': 'token ' + githubToken, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        if (!resp.ok) {
+            const err = await resp.json();
+            throw new Error(err.message || 'Falha no upload');
+        }
+        return resp.json();
+    }
+
+    // ===== Helpers =====
+    function generateSlug(title) {
+        return title.toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+            .substring(0, 60);
+    }
+
+    function showStatus(msg, type) {
+        const el = document.getElementById('statusMsg');
+        el.textContent = msg;
+        el.className = 'status-msg ' + type;
+    }
+    </script>
+</body>
+</html>
