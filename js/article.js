@@ -83,6 +83,9 @@
       dateEl.setAttribute('datetime', article.date);
     }
 
+    const authorEl = document.getElementById('authorName');
+    if (authorEl) authorEl.textContent = article.author || 'Renan Meneses';
+
     const sourceEl = document.getElementById('articleSource');
     if (sourceEl) sourceEl.textContent = article.source || 'Mundo em Foco';
 
@@ -157,7 +160,7 @@
         dateModified: article.dateModified || article.date,
         author: {
           '@type': 'Person',
-          name: 'Renan Meneses',
+          name: article.author || 'Renan Meneses',
           url: 'https://renanmenesesadv.github.io/Portal-Mundo-Flow/sobre.html'
         },
         publisher: {

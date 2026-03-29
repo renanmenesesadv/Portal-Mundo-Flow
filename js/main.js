@@ -175,7 +175,7 @@
               <h3 class="card-title">${escapeHtml(a.title)}</h3>
               <p class="card-excerpt">${escapeHtml(truncate(a.excerpt || '', 120))}</p>
               <div class="card-meta">
-                <span>Por Renan Meneses</span>
+                <span>Por ${a.author || 'Renan Meneses'}</span>
                 <span>${formatDate(a.date)}</span>
               </div>
             </div>
