@@ -156,8 +156,9 @@
         datePublished: article.date,
         dateModified: article.dateModified || article.date,
         author: {
-          '@type': 'Organization',
-          name: 'Mundo em Foco'
+          '@type': 'Person',
+          name: 'Renan Meneses',
+          url: 'https://renanmenesesadv.github.io/Portal-Mundo-Flow/sobre.html'
         },
         publisher: {
           '@type': 'Organization',
