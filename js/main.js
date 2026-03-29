@@ -129,6 +129,7 @@
     const imgHtml = article.image
       ? `<img class="featured-img" src="${article.image}" alt="${escapeHtml(article.title)}" loading="lazy">`
       : `<div class="featured-img card-placeholder">${catInfo.icon}</div>`;
+    const creditHtml = article.imageCredit ? `<span style="position:absolute;bottom:60px;right:16px;background:rgba(0,0,0,.7);color:#fff;font-size:.65rem;padding:2px 8px;border-radius:3px;z-index:3">${escapeHtml(article.imageCredit)}</span>` : '';
 
     section.innerHTML = `
       <a href="artigo.html?id=${article.slug}" class="featured-card">
@@ -139,6 +140,7 @@
           <p class="featured-excerpt">${escapeHtml(article.excerpt || '')}</p>
           <span class="featured-date">${formatDate(article.date)}</span>
         </div>
+        ${creditHtml}
       </a>`;
   }
 
@@ -160,7 +162,7 @@
     const html = batch.map(a => {
       const catInfo = CONFIG.categories[a.category] || { name: a.category, icon: '📰' };
       const imgHtml = a.image
-        ? `<img class="card-img" src="${a.image}" alt="${escapeHtml(a.title)}" loading="lazy">`
+        ? `<div class="card-img-wrap"><img class="card-img" src="${a.image}" alt="${escapeHtml(a.title)}" loading="lazy">${a.imageCredit ? `<span class="card-img-credit">${escapeHtml(a.imageCredit)}</span>` : ''}</div>`
         : `<div class="card-placeholder">${catInfo.icon}</div>`;
 
       return `
