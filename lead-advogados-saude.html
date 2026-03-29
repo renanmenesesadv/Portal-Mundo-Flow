@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Receba conteúdos exclusivos sobre Direito da Saúde. Cadastre-se gratuitamente e fique por dentro das principais decisões, legislações e oportunidades para advogados.">
-    <title>Direito da Saúde | Conteúdo Exclusivo para Advogados</title>
+    <meta name="description" content="Cadastre-se para acessar a plataforma de elaboração automatizada de petições em Direito da Saúde. Vagas limitadas para o período de testes gratuitos.">
+    <title>JusSwift | Petições Automatizadas em Direito da Saúde</title>
     <style>
         *, *::before, *::after {
             box-sizing: border-box;
@@ -28,7 +28,7 @@
             background: #fff;
             border-radius: 16px;
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-            max-width: 520px;
+            max-width: 560px;
             width: 100%;
             overflow: hidden;
         }
@@ -40,56 +40,72 @@
             text-align: center;
         }
 
-        .lead-header .icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-            display: block;
+        .lead-header .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
         }
 
         .lead-header h1 {
-            font-size: 1.6rem;
+            font-size: 1.55rem;
             font-weight: 700;
             line-height: 1.3;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
-        .lead-header p {
-            font-size: 0.95rem;
-            opacity: 0.9;
+        .lead-header .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.85;
             line-height: 1.5;
         }
 
-        .lead-benefits {
-            padding: 24px 32px 0;
+        .lead-body {
+            padding: 28px 32px 0;
         }
 
-        .lead-benefits ul {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .lead-benefits li {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            font-size: 0.9rem;
+        .lead-body p {
+            font-size: 0.92rem;
             color: #333;
-            line-height: 1.4;
+            line-height: 1.65;
+            margin-bottom: 14px;
         }
 
-        .lead-benefits li::before {
-            content: "\2713";
+        .lead-body strong {
             color: #0f4c75;
-            font-weight: 700;
-            font-size: 1rem;
-            flex-shrink: 0;
-            margin-top: 1px;
+        }
+
+        .lead-body .highlight {
+            background: #eef6fb;
+            border-left: 3px solid #0f4c75;
+            padding: 14px 18px;
+            border-radius: 0 8px 8px 0;
+            margin: 18px 0;
+            font-size: 0.88rem;
+            color: #1a1a2e;
+            line-height: 1.55;
+        }
+
+        .lead-body .highlight strong {
+            color: #0f4c75;
+        }
+
+        .form-intro {
+            padding: 0 32px;
+            font-size: 0.88rem;
+            color: #555;
+            margin-bottom: 4px;
+            font-weight: 600;
         }
 
         .lead-form {
-            padding: 24px 32px 32px;
+            padding: 20px 32px 32px;
         }
 
         .form-group {
@@ -104,8 +120,7 @@
             margin-bottom: 6px;
         }
 
-        .form-group input,
-        .form-group select {
+        .form-group input {
             width: 100%;
             padding: 12px 14px;
             border: 1.5px solid #d1d5db;
@@ -114,19 +129,9 @@
             color: #1a1a2e;
             background: #fafafa;
             transition: border-color 0.2s, box-shadow 0.2s;
-            appearance: none;
-            -webkit-appearance: none;
         }
 
-        .form-group select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 14px center;
-            padding-right: 36px;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
+        .form-group input:focus {
             outline: none;
             border-color: #0f4c75;
             box-shadow: 0 0 0 3px rgba(15, 76, 117, 0.12);
@@ -215,10 +220,14 @@
                 padding: 32px 20px 24px;
             }
             .lead-header h1 {
-                font-size: 1.35rem;
+                font-size: 1.3rem;
             }
-            .lead-benefits,
+            .lead-body,
             .lead-form {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+            .form-intro {
                 padding-left: 20px;
                 padding-right: 20px;
             }
@@ -229,22 +238,27 @@
 
     <div class="lead-container">
         <div class="lead-header">
-            <span class="icon">&#9878;</span>
-            <h1>Direito da Saúde: Conteúdo Exclusivo para Advogados</h1>
-            <p>Receba análises, decisões judiciais e oportunidades de atuação diretamente no seu e-mail.</p>
+            <span class="badge">Vagas Limitadas</span>
+            <h1>Plataforma de Petições Automatizadas em Direito da Saúde</h1>
+            <p class="subtitle">Cadastre-se para participar do período de testes gratuitos e receba as instruções de acesso por e-mail.</p>
         </div>
 
-        <div class="lead-benefits">
-            <ul>
-                <li>Jurisprudência atualizada sobre planos de saúde e SUS</li>
-                <li>Análises de novas legislações e regulamentações da ANS</li>
-                <li>Modelos de petições e estratégias processuais</li>
-                <li>Oportunidades de networking e eventos da área</li>
-            </ul>
+        <div class="lead-body" id="leadBody">
+            <p>Desenvolvi uma plataforma que elabora petições na área do Direito da Saúde de forma automatizada, com base na prática real e diária do meu escritório.</p>
+
+            <p>Atualmente, o banco de inteligência da plataforma já conta com <strong>mais de 2 mil petições</strong> da área da saúde, tornando a ferramenta mais precisa, prática e alinhada à realidade da advocacia.</p>
+
+            <div class="highlight">
+                Nesta fase inicial, vou disponibilizar <strong>30 dias de acesso gratuito</strong> para alguns grupos, com <strong>vagas limitadas</strong>.
+            </div>
+
+            <p>Para participar, peço apenas que o preenchimento seja feito corretamente, seguindo a sequência solicitada.</p>
         </div>
+
+        <p class="form-intro">Informe seus dados profissionais:</p>
 
         <form class="lead-form" id="leadForm" action="https://formsubmit.co/renan@vmdadvocacia.com" method="POST">
-            <input type="hidden" name="_subject" value="Novo Lead - Advogado Direito da Saúde">
+            <input type="hidden" name="_subject" value="Novo Lead - JusSwift Petições Automatizadas">
             <input type="hidden" name="_captcha" value="false">
             <input type="hidden" name="_template" value="table">
             <input type="text" name="_honey" style="display:none">
@@ -255,49 +269,34 @@
             </div>
 
             <div class="form-group">
-                <label for="email">E-mail profissional</label>
+                <label for="email">E-mail</label>
                 <input type="email" id="email" name="E-mail" placeholder="advogado@escritorio.com.br" required>
             </div>
 
             <div class="form-group">
-                <label for="telefone">WhatsApp</label>
+                <label for="telefone">Telefone / WhatsApp</label>
                 <input type="tel" id="telefone" name="WhatsApp" placeholder="(11) 99999-9999" required>
             </div>
 
             <div class="form-group">
                 <label for="oab">Número da OAB</label>
-                <input type="text" id="oab" name="OAB" placeholder="123.456/SP">
+                <input type="text" id="oab" name="OAB" placeholder="123.456/SP" required>
             </div>
 
-            <div class="form-group">
-                <label for="atuacao">Principal área de atuação em Direito da Saúde</label>
-                <select id="atuacao" name="Area de Atuacao" required>
-                    <option value="" disabled selected>Selecione...</option>
-                    <option value="Planos de Saúde">Planos de Saúde</option>
-                    <option value="Erro Médico">Erro Médico</option>
-                    <option value="Direito ao SUS / Judicialização">Direito ao SUS / Judicialização</option>
-                    <option value="Regulatório (ANS/ANVISA)">Regulatório (ANS/ANVISA)</option>
-                    <option value="Direito Hospitalar">Direito Hospitalar</option>
-                    <option value="Biodireito e Bioética">Biodireito e Bioética</option>
-                    <option value="Direito Farmacêutico">Direito Farmacêutico</option>
-                    <option value="Outro">Outro</option>
-                </select>
-            </div>
+            <button type="submit" class="btn-submit">Garantir minha vaga gratuita</button>
 
-            <button type="submit" class="btn-submit">Quero receber conteúdos exclusivos</button>
-
-            <p class="form-note">Seus dados estão protegidos. Você pode cancelar a qualquer momento.<br>Ao se cadastrar, você concorda com nossa Política de Privacidade.</p>
+            <p class="form-note">Seus dados estão protegidos e serão usados exclusivamente para liberar seu acesso.<br>Ao se cadastrar, você concorda com nossa Política de Privacidade.</p>
         </form>
 
         <div class="success-message" id="successMessage">
             <div class="check-icon">&#10003;</div>
-            <h2>Cadastro realizado!</h2>
-            <p>Bem-vindo(a)! Em breve você receberá os melhores conteúdos sobre Direito da Saúde diretamente no seu e-mail.</p>
+            <h2>Inscrição realizada com sucesso!</h2>
+            <p>Em breve, você receberá por e-mail as informações de acesso à plataforma. Fique atento à sua caixa de entrada e spam.</p>
         </div>
     </div>
 
     <div class="powered-by">
-        <a href="index.html">Mundo em Foco</a>
+        <a href="index.html">JusSwift</a> &mdash; Petições inteligentes para advogados
     </div>
 
     <script>
@@ -328,10 +327,10 @@
             const nome = document.getElementById('nome').value.trim();
             const email = document.getElementById('email').value.trim();
             const telefone = document.getElementById('telefone').value.trim();
-            const atuacao = document.getElementById('atuacao').value;
+            const oab = document.getElementById('oab').value.trim();
 
-            if (!nome || !email || !telefone || !atuacao) {
-                alert('Por favor, preencha todos os campos obrigatórios.');
+            if (!nome || !email || !telefone || !oab) {
+                alert('Por favor, preencha todos os campos.');
                 return;
             }
 
@@ -355,7 +354,8 @@
             .then(function (response) {
                 if (response.ok) {
                     form.style.display = 'none';
-                    document.querySelector('.lead-benefits').style.display = 'none';
+                    document.getElementById('leadBody').style.display = 'none';
+                    document.querySelector('.form-intro').style.display = 'none';
                     document.getElementById('successMessage').style.display = 'block';
                 } else {
                     throw new Error('Erro no envio');
@@ -364,7 +364,7 @@
             .catch(function () {
                 alert('Ocorreu um erro ao enviar. Tente novamente.');
                 btn.disabled = false;
-                btn.textContent = 'Quero receber conteúdos exclusivos';
+                btn.textContent = 'Garantir minha vaga gratuita';
             });
         });
     </script>
