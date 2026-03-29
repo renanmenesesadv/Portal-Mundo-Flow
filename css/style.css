@@ -50,8 +50,9 @@ ul{list-style:none}
 .breaking-label{background:rgba(0,0,0,.3);padding:4px 12px;font-weight:700;font-size:.8rem;white-space:nowrap;margin-right:12px;text-transform:uppercase;letter-spacing:1px}
 .ticker-wrap{overflow:hidden;flex:1}
 .ticker{display:flex;gap:40px;animation:ticker 30s linear infinite;white-space:nowrap}
-.ticker a{color:#fff;font-size:.85rem;font-weight:500}
+.ticker a{color:#fff;font-size:.85rem;font-weight:500;padding-right:40px;border-right:1px solid rgba(255,255,255,.3)}
 .ticker a:hover{text-decoration:underline}
+.ticker a:last-child{border-right:none}
 @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* ===== MAIN CONTENT ===== */
@@ -59,9 +60,10 @@ ul{list-style:none}
 
 /* Featured */
 .featured-section{margin-bottom:32px}
-.featured-card{position:relative;border-radius:var(--radius);overflow:hidden;background:var(--bg-card);box-shadow:var(--shadow);display:block;min-height:400px}
+.featured-card{position:relative;border-radius:var(--radius);overflow:hidden;background:linear-gradient(135deg,var(--primary-light),var(--primary));box-shadow:var(--shadow);display:block;min-height:400px}
 .featured-card .featured-img{width:100%;height:400px;object-fit:cover}
-.featured-card .featured-overlay{position:absolute;bottom:0;left:0;right:0;padding:32px;background:linear-gradient(transparent,rgba(0,0,0,.9))}
+.featured-card .card-placeholder{width:100%;height:400px;display:flex;align-items:center;justify-content:center;font-size:5rem;color:var(--accent);background:linear-gradient(135deg,var(--primary-light),var(--primary))}
+.featured-card .featured-overlay{position:absolute;bottom:0;left:0;right:0;padding:32px;background:linear-gradient(transparent,rgba(0,0,0,.95))}
 .featured-card .featured-category{display:inline-block;background:var(--accent);color:#fff;padding:4px 12px;border-radius:4px;font-size:.75rem;font-weight:700;text-transform:uppercase;margin-bottom:8px}
 .featured-card .featured-title{font-size:1.8rem;font-weight:800;color:#fff;line-height:1.3;margin-bottom:8px}
 .featured-card .featured-excerpt{color:rgba(255,255,255,.8);font-size:.95rem;line-height:1.5}

@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const BASE_URL = 'https://SEU-USUARIO.github.io/blog-noticias-mundo/';
+  const BASE_URL = 'https://renanmenesesadv.github.io/Portal-Mundo-Flow/';
   const DATA_URL = 'data/articles.json';
 
   const CATEGORIES = {

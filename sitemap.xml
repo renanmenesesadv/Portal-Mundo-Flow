@@ -2,47 +2,47 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
     <url>
-        <loc>https://SEU-USUARIO.github.io/blog-noticias-mundo/</loc>
+        <loc>https://renanmenesesadv.github.io/Portal-Mundo-Flow/</loc>
         <changefreq>hourly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://SEU-USUARIO.github.io/blog-noticias-mundo/categoria.html?cat=politica</loc>
+        <loc>https://renanmenesesadv.github.io/Portal-Mundo-Flow/categoria.html?cat=politica</loc>
         <changefreq>hourly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://SEU-USUARIO.github.io/blog-noticias-mundo/categoria.html?cat=economia</loc>
+        <loc>https://renanmenesesadv.github.io/Portal-Mundo-Flow/categoria.html?cat=economia</loc>
         <changefreq>hourly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://SEU-USUARIO.github.io/blog-noticias-mundo/categoria.html?cat=tecnologia</loc>
+        <loc>https://renanmenesesadv.github.io/Portal-Mundo-Flow/categoria.html?cat=tecnologia</loc>
         <changefreq>hourly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://SEU-USUARIO.github.io/blog-noticias-mundo/categoria.html?cat=seguranca</loc>
+        <loc>https://renanmenesesadv.github.io/Portal-Mundo-Flow/categoria.html?cat=seguranca</loc>
         <changefreq>hourly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://SEU-USUARIO.github.io/blog-noticias-mundo/categoria.html?cat=internacional</loc>
+        <loc>https://renanmenesesadv.github.io/Portal-Mundo-Flow/categoria.html?cat=internacional</loc>
         <changefreq>hourly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://SEU-USUARIO.github.io/blog-noticias-mundo/categoria.html?cat=negocios</loc>
+        <loc>https://renanmenesesadv.github.io/Portal-Mundo-Flow/categoria.html?cat=negocios</loc>
         <changefreq>hourly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://SEU-USUARIO.github.io/blog-noticias-mundo/sobre.html</loc>
+        <loc>https://renanmenesesadv.github.io/Portal-Mundo-Flow/sobre.html</loc>
         <changefreq>monthly</changefreq>
         <priority>0.4</priority>
     </url>
     <url>
-        <loc>https://SEU-USUARIO.github.io/blog-noticias-mundo/politica-privacidade.html</loc>
+        <loc>https://renanmenesesadv.github.io/Portal-Mundo-Flow/politica-privacidade.html</loc>
         <changefreq>yearly</changefreq>
         <priority>0.3</priority>
     </url>

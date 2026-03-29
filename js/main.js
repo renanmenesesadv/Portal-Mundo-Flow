@@ -103,8 +103,9 @@
 
     renderBreakingNews(articles.slice(0, 5));
     renderFeatured(articles[0]);
+    // Grid começa do artigo 1 (featured ja mostra o 0)
     displayedCount = 0;
-    renderNewsGrid(articles);
+    renderNewsGrid(articles.length > 1 ? articles.slice(1) : articles);
     renderCategories(allArticles);
   }
 
@@ -154,7 +155,7 @@
     displayedCount += batch.length;
 
     if (!batch.length && displayedCount === 0) {
-      grid.innerHTML = '<p class="loading-spinner">Nenhuma notícia encontrada. Em breve teremos conteúdo!</p>';
+      grid.innerHTML = '<p class="loading-spinner">Novas notícias chegando em breve. O portal é atualizado automaticamente.</p>';
       if (loadMore) loadMore.style.display = 'none';
       return;
     }

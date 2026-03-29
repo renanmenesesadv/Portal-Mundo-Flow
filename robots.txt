@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /data/
 
-Sitemap: https://SEU-USUARIO.github.io/blog-noticias-mundo/sitemap.xml
+Sitemap: https://renanmenesesadv.github.io/Portal-Mundo-Flow/sitemap.xml
