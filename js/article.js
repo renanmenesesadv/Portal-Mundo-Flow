@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const BASE_URL = 'https://renanmenesesadv.github.io/Portal-Mundo-Flow/';
+  const BASE_URL = 'https://mundoflownoticias.com.br/';
   const DATA_URL = 'data/articles.json';
 
   const CATEGORIES = {
@@ -161,7 +161,7 @@
         author: {
           '@type': 'Person',
           name: article.author || 'Renan Meneses',
-          url: 'https://renanmenesesadv.github.io/Portal-Mundo-Flow/sobre.html'
+          url: 'https://mundoflownoticias.com.br/sobre.html'
         },
         publisher: {
           '@type': 'Organization',

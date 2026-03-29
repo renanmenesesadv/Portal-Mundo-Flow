@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /data/
 
-Sitemap: https://renanmenesesadv.github.io/Portal-Mundo-Flow/sitemap.xml
+Sitemap: https://mundoflownoticias.com.br/sitemap.xml

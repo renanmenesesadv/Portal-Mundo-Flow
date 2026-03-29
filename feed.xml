@@ -2,11 +2,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
     <channel>
         <title>Mundo em Foco</title>
-        <link>https://renanmenesesadv.github.io/Portal-Mundo-Flow/</link>
+        <link>https://mundoflownoticias.com.br/</link>
         <description>Portal de noticias nacionais e internacionais em tempo real</description>
         <language>pt-BR</language>
         <lastBuildDate></lastBuildDate>
-        <atom:link href="https://renanmenesesadv.github.io/Portal-Mundo-Flow/feed.xml" rel="self" type="application/rss+xml"/>
+        <atom:link href="https://mundoflownoticias.com.br/feed.xml" rel="self" type="application/rss+xml"/>
         <!-- Items are dynamically added by n8n workflow -->
     </channel>
 </rss>

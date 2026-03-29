@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
+    <meta name="google-adsense-account" content="ca-pub-9450350856883249">
     <title>Admin - Mundo em Foco</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9450350856883249"
+     crossorigin="anonymous"></script>
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" type="image/png" href="img/favicon.png">
     <style>
@@ -57,6 +60,14 @@
         .auto-btn:hover{opacity:.85}
         .auto-btn.secondary{background:var(--primary-light);color:var(--text);border:1px solid var(--border)}
         .auto-btn:disabled{opacity:.5;cursor:not-allowed}
+        .auto-controls{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+        .toggle-btn{min-width:180px;display:flex;align-items:center;justify-content:center;gap:6px}
+        .toggle-btn.active{background:#00d4aa}
+        .auto-status{display:flex;align-items:center;gap:6px}
+        .status-dot{width:10px;height:10px;border-radius:50%;background:var(--text-muted);display:inline-block}
+        .status-dot.on{background:#00d4aa;box-shadow:0 0 6px #00d4aa}
+        .status-dot.off{background:#e53e3e}
+        .status-label{font-size:.8rem;font-weight:600;color:var(--text-muted)}
         .auto-stats{font-size:.75rem;color:var(--text-muted);margin-left:auto}
         .admin-nav{background:var(--primary-light);border-bottom:1px solid var(--border);position:sticky;top:52px;z-index:50}
         .admin-nav ul{display:flex;list-style:none;max-width:900px;margin:0 auto;padding:0}
@@ -85,6 +96,7 @@
         .edit-modal-header h3{font-size:1.2rem;color:var(--accent)}
         @media(max-width:768px){.form-row,.form-row-3{grid-template-columns:1fr}.auto-header{flex-direction:column;gap:12px;align-items:flex-start}.manager-filter{flex-direction:column}.article-row{flex-direction:column;align-items:flex-start}}
     </style>
+    <script src="js/adsense.js"></script>
 </head>
 <body>
     <header class="site-header">
@@ -113,6 +125,10 @@
             <label>Token GitHub</label>
             <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
         </div>
+        <div class="form-group">
+            <label>API Key n8n <span style="font-weight:400;color:var(--text-muted)">(para automacao)</span></label>
+            <input type="password" id="n8nToken" placeholder="n8n_api_xxxxxxxxxxxx">
+        </div>
         <button class="btn-publish" onclick="doLogin()">Entrar</button>
         <p style="margin-top:12px;font-size:.75rem;color:var(--text-muted)">Token fica salvo no navegador (localStorage)</p>
     </div>
@@ -126,14 +142,30 @@
             <div class="auto-header">
                 <div>
                     <h2 class="auto-title">Automacao de Noticias</h2>
-                    <p class="auto-desc">Gerencie o workflow de publicacao automatica direto no n8n</p>
+                    <p class="auto-desc">Controle o workflow de publicacao automatica</p>
+                </div>
+                <div class="auto-status" id="autoStatus">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span class="status-label" id="statusLabel">Verificando...</span>
                 </div>
             </div>
-            <div class="auto-actions">
-                <a class="auto-btn" href="https://renanmenesesadv.app.n8n.cloud/workflow/b8gQZOtuCyIaLCnD" target="_blank" style="text-decoration:none;text-align:center">Abrir Workflow no n8n</a>
-                <a class="auto-btn secondary" href="https://renanmenesesadv.app.n8n.cloud/workflows" target="_blank" style="text-decoration:none;text-align:center">Painel n8n</a>
-                <a class="auto-btn secondary" href="https://renanmenesesadv.github.io/radar-rn-hub/" target="_blank" style="text-decoration:none;text-align:center">Radar Hub (fontes)</a>
+
+            <div class="auto-controls">
+                <button class="auto-btn toggle-btn" id="toggleAutoBtn" onclick="toggleAutomation()" disabled>
+                    <span id="toggleIcon">&#9654;</span> <span id="toggleText">Carregando...</span>
+                </button>
+                <button class="auto-btn" id="runNowBtn" onclick="runWorkflowNow()" style="background:#00d4aa">
+                    &#9889; Executar Agora
+                </button>
             </div>
+
+            <div class="auto-actions" style="margin-top:10px">
+                <a class="auto-btn secondary" href="https://renanmenesesadv.app.n8n.cloud/workflow/b8gQZOtuCyIaLCnD" target="_blank" style="text-decoration:none;text-align:center">Abrir Workflow</a>
+                <a class="auto-btn secondary" href="https://renanmenesesadv.app.n8n.cloud/workflows" target="_blank" style="text-decoration:none;text-align:center">Painel n8n</a>
+                <a class="auto-btn secondary" href="https://renanmenesesadv.github.io/radar-rn-hub/" target="_blank" style="text-decoration:none;text-align:center">Radar Hub</a>
+            </div>
+
+            <div class="status-msg" id="autoMsg"></div>
         </div>
 
         </div> <!-- /secAutomacao -->
@@ -317,10 +349,122 @@
     // ===== Config =====
     const REPO_OWNER = 'renanmenesesadv';
     const REPO_NAME = 'Portal-Mundo-Flow';
+    const N8N_BASE = 'https://renanmenesesadv.app.n8n.cloud';
+    const WORKFLOW_ID = 'b8gQZOtuCyIaLCnD';
     let githubToken = '';
+    let n8nApiKey = '';
     let tags = [];
     let imageBase64 = '';
     let imageName = '';
+
+    // ===== n8n Automation Control =====
+    function getN8nHeaders() {
+        return { 'X-N8N-API-KEY': n8nApiKey, 'Accept': 'application/json', 'Content-Type': 'application/json' };
+    }
+
+    async function checkWorkflowStatus() {
+        if (!n8nApiKey) {
+            updateAutoUI(null);
+            return;
+        }
+        try {
+            const resp = await fetch(N8N_BASE + '/api/v1/workflows/' + WORKFLOW_ID, { headers: getN8nHeaders() });
+            if (!resp.ok) throw new Error('Falha na API');
+            const data = await resp.json();
+            updateAutoUI(data.active);
+        } catch (e) {
+            updateAutoUI(null, e.message);
+        }
+    }
+
+    function updateAutoUI(active, error) {
+        const dot = document.getElementById('statusDot');
+        const label = document.getElementById('statusLabel');
+        const btn = document.getElementById('toggleAutoBtn');
+        const icon = document.getElementById('toggleIcon');
+        const text = document.getElementById('toggleText');
+
+        if (error || active === null) {
+            dot.className = 'status-dot off';
+            label.textContent = error ? 'Erro: ' + error : 'Insira a API Key do n8n';
+            btn.disabled = !n8nApiKey;
+            icon.innerHTML = '&#9654;';
+            text.textContent = 'Ligar';
+            btn.classList.remove('active');
+            return;
+        }
+
+        dot.className = active ? 'status-dot on' : 'status-dot off';
+        label.textContent = active ? 'Automacao LIGADA' : 'Automacao DESLIGADA';
+        btn.disabled = false;
+        icon.innerHTML = active ? '&#9724;' : '&#9654;';
+        text.textContent = active ? 'Desligar' : 'Ligar';
+        btn.classList.toggle('active', active);
+    }
+
+    async function toggleAutomation() {
+        const btn = document.getElementById('toggleAutoBtn');
+        const msg = document.getElementById('autoMsg');
+        btn.disabled = true;
+
+        try {
+            // Check current state
+            const resp = await fetch(N8N_BASE + '/api/v1/workflows/' + WORKFLOW_ID, { headers: getN8nHeaders() });
+            const data = await resp.json();
+            const newState = !data.active;
+
+            // Activate or deactivate
+            const endpoint = newState
+                ? N8N_BASE + '/api/v1/workflows/' + WORKFLOW_ID + '/activate'
+                : N8N_BASE + '/api/v1/workflows/' + WORKFLOW_ID + '/deactivate';
+
+            const toggleResp = await fetch(endpoint, { method: 'POST', headers: getN8nHeaders() });
+            if (!toggleResp.ok) throw new Error('Falha ao alterar estado');
+
+            updateAutoUI(newState);
+            showAutoMsg(newState ? 'Automacao LIGADA com sucesso!' : 'Automacao DESLIGADA.', newState ? 'success' : 'error');
+        } catch (e) {
+            showAutoMsg('Erro: ' + e.message, 'error');
+            btn.disabled = false;
+        }
+    }
+
+    async function runWorkflowNow() {
+        const btn = document.getElementById('runNowBtn');
+        const msg = document.getElementById('autoMsg');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '&#9889; Executando...';
+
+        try {
+            if (!n8nApiKey) throw new Error('Insira a API Key do n8n');
+
+            const resp = await fetch(N8N_BASE + '/api/v1/workflows/' + WORKFLOW_ID + '/run', {
+                method: 'POST',
+                headers: getN8nHeaders(),
+                body: JSON.stringify({})
+            });
+
+            if (!resp.ok) {
+                const err = await resp.json().catch(() => ({}));
+                throw new Error(err.message || 'Falha ao executar (HTTP ' + resp.status + ')');
+            }
+
+            showAutoMsg('Workflow executado! Novos artigos devem aparecer em 2-3 minutos.', 'success');
+        } catch (e) {
+            showAutoMsg('Erro: ' + e.message, 'error');
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+
+    function showAutoMsg(text, type) {
+        const el = document.getElementById('autoMsg');
+        el.textContent = text;
+        el.className = 'status-msg ' + type;
+        setTimeout(() => { el.className = 'status-msg'; }, 8000);
+    }
 
     // ===== Login =====
     function doLogin() {
@@ -328,6 +472,13 @@
         if (!token) return;
         githubToken = token;
         localStorage.setItem('mf_token', token);
+
+        const n8nKey = document.getElementById('n8nToken').value.trim();
+        if (n8nKey) {
+            n8nApiKey = n8nKey;
+            localStorage.setItem('mf_n8n_key', n8nKey);
+        }
+
         showAdmin();
     }
 
@@ -336,17 +487,25 @@
         document.getElementById('editorScreen').style.display = 'block';
         document.getElementById('adminNav').style.display = 'block';
         loadArticlesList();
+
+        // Restore n8n key and check status
+        if (!n8nApiKey) {
+            n8nApiKey = localStorage.getItem('mf_n8n_key') || '';
+        }
+        checkWorkflowStatus();
     }
 
     // Auto-login
     const saved = localStorage.getItem('mf_token');
     if (saved) {
         githubToken = saved;
+        n8nApiKey = localStorage.getItem('mf_n8n_key') || '';
         showAdmin();
     }
 
     function doLogout() {
         localStorage.removeItem('mf_token');
+        localStorage.removeItem('mf_n8n_key');
         location.reload();
     }
 
@@ -482,7 +641,7 @@
                 const imgPath = 'img/articles/' + imgSlug;
 
                 await githubPut(imgPath, imageBase64, 'img: ' + imgSlug);
-                imageUrl = 'https://raw.githubusercontent.com/' + REPO_OWNER + '/' + REPO_NAME + '/main/' + imgPath;
+                imageUrl = 'https://mundoflownoticias.com.br/' + imgPath;
                 showStatus('Imagem enviada, salvando artigo...', 'loading');
             }
 
