@@ -71,8 +71,7 @@
         .admin-nav ul{display:flex;list-style:none;max-width:900px;margin:0 auto;padding:0}
         .admin-nav a{display:block;padding:12px 20px;font-size:.85rem;font-weight:600;color:var(--text-muted);transition:all .2s;border-bottom:2px solid transparent}
         .admin-nav a:hover,.admin-nav a.active{color:var(--accent);border-bottom-color:var(--accent)}
-        .admin-section{display:none}
-        .admin-section.active{display:block}
+        .admin-section{display:block;margin-bottom:32px;padding-bottom:24px;border-bottom:2px solid var(--border)}
         .articles-manager{margin-top:32px;border-top:2px solid var(--border);padding-top:24px}
         .manager-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
         .manager-filter{display:flex;gap:8px;margin-bottom:12px}
@@ -108,9 +107,9 @@
     <!-- Menu Admin -->
     <nav class="admin-nav" id="adminNav" style="display:none">
         <ul>
-            <li><a href="#" class="active" onclick="showSection('automacao',this)">Automacao</a></li>
-            <li><a href="#" onclick="showSection('editor',this)">Novo Artigo</a></li>
-            <li><a href="#" onclick="showSection('gestao',this)">Artigos Publicados</a></li>
+            <li><a href="#secAutomacao" class="active">Automacao</a></li>
+            <li><a href="#secEditor">Novo Artigo</a></li>
+            <li><a href="#secGestao">Artigos Publicados</a></li>
             <li><a href="index.html" target="_blank" style="color:var(--success)">Ver Site</a></li>
             <li><a href="#" onclick="doLogout()" style="color:var(--accent)">Sair</a></li>
         </ul>
@@ -135,7 +134,7 @@
     <div id="editorScreen" class="admin-container" style="display:none">
 
         <!-- Painel de Automacao -->
-        <div class="admin-section active" id="secAutomacao">
+        <div class="admin-section" id="secAutomacao">
         <div class="automation-panel" id="automationPanel">
             <div class="auto-header">
                 <div>
@@ -376,18 +375,6 @@
         document.getElementById('adminNav').style.display = 'block';
         checkWorkflowStatus();
         loadArticlesList();
-    }
-
-    // ===== Navigation =====
-    function showSection(name, link) {
-        document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.admin-nav a').forEach(a => a.classList.remove('active'));
-        const map = { automacao: 'secAutomacao', editor: 'secEditor', gestao: 'secGestao' };
-        const sec = document.getElementById(map[name]);
-        if (sec) sec.classList.add('active');
-        if (link) link.classList.add('active');
-        if (name === 'gestao') loadArticlesList();
-        return false;
     }
 
     function doLogout() {
