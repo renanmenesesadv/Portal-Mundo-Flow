@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="index, follow">
-    <meta name="description" id="metaDesc" content="Not\u00edcias por categoria - Mundo em Foco">
+    <meta name="description" id="metaDesc" content="Notícias por categoria - Mundo em Foco">
     <title id="pageTitle">Categoria - Mundo em Foco</title>
     <!-- AdSense + Analytics - ativar apos dominio Hostinger -->
     <link rel="stylesheet" href="css/style.css">
@@ -14,23 +14,23 @@
     <header class="site-header">
         <div class="container">
             <div class="header-top">
-                <a href="index.html" class="logo"><h1>Mundo em Foco</h1><span class="tagline">Not\u00edcias Nacionais e Internacionais</span></a>
+                <a href="index.html" class="logo"><h1>Mundo em Foco</h1><span class="tagline">Notícias Nacionais e Internacionais</span></a>
                 <div class="header-actions">
                     <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Buscar not\u00edcias..." aria-label="Buscar">
+                        <input type="text" id="searchInput" placeholder="Buscar notícias..." aria-label="Buscar">
                         <button id="searchBtn" aria-label="Buscar">&#128269;</button>
                     </div>
                     <button class="menu-toggle" id="menuToggle" aria-label="Menu">&#9776;</button>
                 </div>
             </div>
             <nav class="main-nav" id="mainNav"><ul>
-                <li><a href="index.html">In\u00edcio</a></li>
-                <li><a href="categoria.html?cat=politica" id="nav-politica">Pol\u00edtica</a></li>
+                <li><a href="index.html">Início</a></li>
+                <li><a href="categoria.html?cat=politica" id="nav-politica">Política</a></li>
                 <li><a href="categoria.html?cat=economia" id="nav-economia">Economia</a></li>
                 <li><a href="categoria.html?cat=tecnologia" id="nav-tecnologia">Tecnologia</a></li>
-                <li><a href="categoria.html?cat=seguranca" id="nav-seguranca">Seguran\u00e7a</a></li>
+                <li><a href="categoria.html?cat=seguranca" id="nav-seguranca">Segurança</a></li>
                 <li><a href="categoria.html?cat=internacional" id="nav-internacional">Internacional</a></li>
-                <li><a href="categoria.html?cat=negocios" id="nav-negocios">Neg\u00f3cios</a></li>
+                <li><a href="categoria.html?cat=negocios" id="nav-negocios">Negócios</a></li>
                 <li><a href="categoria.html?cat=geral" id="nav-geral">Geral</a></li>
             </ul></nav>
         </div>
@@ -57,15 +57,15 @@
     <footer class="site-footer">
         <div class="container">
             <div class="footer-grid">
-                <div class="footer-col"><h3>Mundo em Foco</h3><p>Portal de not\u00edcias em tempo real.</p></div>
+                <div class="footer-col"><h3>Mundo em Foco</h3><p>Portal de notícias em tempo real.</p></div>
                 <div class="footer-col"><h3>Categorias</h3><ul>
-                    <li><a href="categoria.html?cat=politica">Pol\u00edtica</a></li>
+                    <li><a href="categoria.html?cat=politica">Política</a></li>
                     <li><a href="categoria.html?cat=economia">Economia</a></li>
                     <li><a href="categoria.html?cat=tecnologia">Tecnologia</a></li>
                     <li><a href="categoria.html?cat=internacional">Internacional</a></li>
                 </ul></div>
                 <div class="footer-col"><h3>Institucional</h3><ul>
-                    <li><a href="sobre.html">Sobre n\u00f3s</a></li>
+                    <li><a href="sobre.html">Sobre nós</a></li>
                     <li><a href="politica-privacidade.html">Privacidade</a></li>
                     <li><a href="termos-de-uso.html">Termos de Uso</a></li>
                     <li><a href="contato.html">Contato</a></li>
@@ -77,8 +77,8 @@
 
     <script>
     (function(){
-      const CATS={tecnologia:'Tecnologia',politica:'Pol\u00edtica',economia:'Economia',seguranca:'Seguran\u00e7a',internacional:'Internacional',negocios:'Neg\u00f3cios',geral:'Geral'};
-      const DESCS={tecnologia:'IA, startups e inova\u00e7\u00e3o',politica:'Governo, elei\u00e7\u00f5es e legisla\u00e7\u00e3o',economia:'Mercado, finan\u00e7as e indicadores',seguranca:'Crime, pol\u00edcia e justi\u00e7a',internacional:'Not\u00edcias do mundo',negocios:'Empresas e empreendedorismo',geral:'Outras not\u00edcias'};
+      const CATS={tecnologia:'Tecnologia',politica:'Política',economia:'Economia',seguranca:'Segurança',internacional:'Internacional',negocios:'Negócios',geral:'Geral'};
+      const DESCS={tecnologia:'IA, startups e inovação',politica:'Governo, eleições e legislação',economia:'Mercado, finanças e indicadores',seguranca:'Crime, polícia e justiça',internacional:'Notícias do mundo',negocios:'Empresas e empreendedorismo',geral:'Outras notícias'};
       let all=[],shown=0;const PER=12;
 
       document.addEventListener('DOMContentLoaded',async()=>{
@@ -93,7 +93,7 @@
         document.getElementById('categoryTitle').textContent=name;
         document.getElementById('categoryDesc').textContent=DESCS[cat]||'';
         document.getElementById('pageTitle').textContent=name+' - Mundo em Foco';
-        document.getElementById('metaDesc').setAttribute('content','Not\u00edcias de '+name+' - Mundo em Foco');
+        document.getElementById('metaDesc').setAttribute('content','Notícias de '+name+' - Mundo em Foco');
         const navEl=document.getElementById('nav-'+cat);if(navEl)navEl.classList.add('active');
 
         try{const r=await fetch('data/articles.json');all=await r.json();all.sort((a,b)=>new Date(b.date)-new Date(a.date));all=all.filter(a=>a.category===cat)}catch(e){all=[]}
@@ -104,7 +104,7 @@
       function render(){
         const grid=document.getElementById('newsGrid'),btn=document.getElementById('loadMoreBtn');
         const batch=all.slice(shown,shown+PER);shown+=batch.length;
-        if(!batch.length&&shown===0){grid.innerHTML='<p class="loading-spinner">Nenhuma not\u00edcia nesta categoria.</p>';btn.style.display='none';return}
+        if(!batch.length&&shown===0){grid.innerHTML='<p class="loading-spinner">Nenhuma notícia nesta categoria.</p>';btn.style.display='none';return}
         grid.insertAdjacentHTML('beforeend',batch.map(a=>`
           <div class="news-card"><a href="artigo.html?id=${a.slug}">
             ${a.image?`<img class="card-img" src="${a.image}" alt="${esc(a.title)}" loading="lazy">`:'<div class="card-placeholder">&#128240;</div>'}
