@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="googlebot" content="index, follow">
+
+    <!-- Dynamic meta tags set by JS -->
+    <meta name="description" id="metaDescription" content="">
+    <meta name="keywords" id="metaKeywords" content="">
+    <link rel="canonical" id="canonicalLink" href="">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" id="ogTitle" content="">
+    <meta property="og:description" id="ogDescription" content="">
+    <meta property="og:url" id="ogUrl" content="">
+    <meta property="og:image" id="ogImage" content="">
+    <meta property="og:site_name" content="Mundo em Foco">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="article:published_time" id="ogPublished" content="">
+    <meta property="article:section" id="ogSection" content="">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" id="twTitle" content="">
+    <meta name="twitter:description" id="twDescription" content="">
+    <meta name="twitter:image" id="twImage" content="">
+
+    <title id="pageTitle">Mundo em Foco</title>
+
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-SEU_ID_ADSENSE" crossorigin="anonymous"></script>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SEU_ID_GA"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-SEU_ID_GA');
+    </script>
+
+    <!-- Article Schema - injected by JS -->
+    <script type="application/ld+json" id="articleSchema"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-top">
+                <a href="index.html" class="logo">
+                    <h1>Mundo em Foco</h1>
+                    <span class="tagline">Not\u00edcias Nacionais e Internacionais</span>
+                </a>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Buscar not\u00edcias..." aria-label="Buscar not\u00edcias">
+                        <button id="searchBtn" aria-label="Buscar">&#128269;</button>
+                    </div>
+                    <button class="menu-toggle" id="menuToggle" aria-label="Menu">&#9776;</button>
+                </div>
+            </div>
+            <nav class="main-nav" id="mainNav" aria-label="Navega\u00e7\u00e3o principal">
+                <ul>
+                    <li><a href="index.html">In\u00edcio</a></li>
+                    <li><a href="categoria.html?cat=politica">Pol\u00edtica</a></li>
+                    <li><a href="categoria.html?cat=economia">Economia</a></li>
+                    <li><a href="categoria.html?cat=tecnologia">Tecnologia</a></li>
+                    <li><a href="categoria.html?cat=seguranca">Seguran\u00e7a</a></li>
+                    <li><a href="categoria.html?cat=internacional">Internacional</a></li>
+                    <li><a href="categoria.html?cat=negocios">Neg\u00f3cios</a></li>
+                    <li><a href="categoria.html?cat=geral">Geral</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+        <div class="container">
+            <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                    <a itemprop="item" href="index.html"><span itemprop="name">In\u00edcio</span></a>
+                    <meta itemprop="position" content="1">
+                </li>
+                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" id="breadcrumbCategory">
+                    <a itemprop="item" href="#"><span itemprop="name" id="breadcrumbCatName"></span></a>
+                    <meta itemprop="position" content="2">
+                </li>
+                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                    <span itemprop="name" id="breadcrumbTitle"></span>
+                    <meta itemprop="position" content="3">
+                </li>
+            </ol>
+        </div>
+    </nav>
+
+    <!-- Article Content -->
+    <main class="container article-page">
+        <div class="article-layout">
+            <article class="article-content" id="articleContent" itemscope itemtype="https://schema.org/NewsArticle">
+                <header class="article-header">
+                    <span class="article-category" id="articleCategory" itemprop="articleSection"></span>
+                    <h1 class="article-title" id="articleTitle" itemprop="headline"></h1>
+                    <div class="article-meta">
+                        <time id="articleDate" itemprop="datePublished" datetime=""></time>
+                        <span class="article-source" id="articleSource"></span>
+                        <span class="article-read-time" id="articleReadTime"></span>
+                    </div>
+                </header>
+
+                <!-- Ad before content -->
+                <div class="ad-container ad-in-article">
+                    <ins class="adsbygoogle"
+                        style="display:block; text-align:center;"
+                        data-ad-layout="in-article"
+                        data-ad-format="fluid"
+                        data-ad-client="ca-pub-SEU_ID_ADSENSE"
+                        data-ad-slot="SEU_SLOT_4"></ins>
+                    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                </div>
+
+                <div class="article-body" id="articleBody" itemprop="articleBody">
+                </div>
+
+                <!-- Ad after content -->
+                <div class="ad-container ad-in-article">
+                    <ins class="adsbygoogle"
+                        style="display:block; text-align:center;"
+                        data-ad-layout="in-article"
+                        data-ad-format="fluid"
+                        data-ad-client="ca-pub-SEU_ID_ADSENSE"
+                        data-ad-slot="SEU_SLOT_5"></ins>
+                    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                </div>
+
+                <!-- Tags -->
+                <div class="article-tags" id="articleTags">
+                </div>
+
+                <!-- Source Link -->
+                <div class="article-source-link">
+                    <a id="originalSourceLink" href="#" target="_blank" rel="noopener noreferrer nofollow">Ver fonte original</a>
+                </div>
+
+                <!-- Share Buttons -->
+                <div class="share-buttons">
+                    <span>Compartilhar:</span>
+                    <a id="shareWhatsapp" href="#" target="_blank" rel="noopener" class="share-btn whatsapp" aria-label="Compartilhar no WhatsApp">WhatsApp</a>
+                    <a id="shareFacebook" href="#" target="_blank" rel="noopener" class="share-btn facebook" aria-label="Compartilhar no Facebook">Facebook</a>
+                    <a id="shareTwitter" href="#" target="_blank" rel="noopener" class="share-btn twitter" aria-label="Compartilhar no Twitter">Twitter</a>
+                    <a id="shareTelegram" href="#" target="_blank" rel="noopener" class="share-btn telegram" aria-label="Compartilhar no Telegram">Telegram</a>
+                    <button id="copyLink" class="share-btn copy" aria-label="Copiar link">Copiar Link</button>
+                </div>
+            </article>
+
+            <!-- Sidebar -->
+            <aside class="article-sidebar">
+                <!-- Ad Sidebar -->
+                <div class="ad-container">
+                    <ins class="adsbygoogle"
+                        style="display:block"
+                        data-ad-client="ca-pub-SEU_ID_ADSENSE"
+                        data-ad-slot="SEU_SLOT_6"
+                        data-ad-format="auto"
+                        data-full-width-responsive="true"></ins>
+                    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                </div>
+
+                <!-- Related Articles -->
+                <div class="sidebar-widget">
+                    <h3>Not\u00edcias Relacionadas</h3>
+                    <div id="relatedArticles" class="related-list">
+                    </div>
+                </div>
+
+                <!-- Popular Articles -->
+                <div class="sidebar-widget">
+                    <h3>Mais Lidas</h3>
+                    <div id="popularArticles" class="related-list">
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>Mundo em Foco</h3>
+                    <p>Seu portal de not\u00edcias nacionais e internacionais com cobertura em tempo real.</p>
+                </div>
+                <div class="footer-col">
+                    <h3>Categorias</h3>
+                    <ul>
+                        <li><a href="categoria.html?cat=politica">Pol\u00edtica</a></li>
+                        <li><a href="categoria.html?cat=economia">Economia</a></li>
+                        <li><a href="categoria.html?cat=tecnologia">Tecnologia</a></li>
+                        <li><a href="categoria.html?cat=seguranca">Seguran\u00e7a</a></li>
+                        <li><a href="categoria.html?cat=internacional">Internacional</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Institucional</h3>
+                    <ul>
+                        <li><a href="sobre.html">Sobre n\u00f3s</a></li>
+                        <li><a href="politica-privacidade.html">Pol\u00edtica de Privacidade</a></li>
+                        <li><a href="termos-de-uso.html">Termos de Uso</a></li>
+                        <li><a href="contato.html">Contato</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Fique por dentro</h3>
+                    <p>Acompanhe as not\u00edcias mais importantes em tempo real.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="currentYear"></span> Mundo em Foco. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/article.js"></script>
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Receba conteúdos exclusivos sobre Direito da Saúde. Cadastre-se gratuitamente e fique por dentro das principais decisões, legislações e oportunidades para advogados.">
+    <title>Direito da Saúde | Conteúdo Exclusivo para Advogados</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .lead-container {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            max-width: 520px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .lead-header {
+            background: linear-gradient(135deg, #0f4c75, #1b262c);
+            color: #fff;
+            padding: 40px 32px 32px;
+            text-align: center;
+        }
+
+        .lead-header .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .lead-header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+
+        .lead-header p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+
+        .lead-benefits {
+            padding: 24px 32px 0;
+        }
+
+        .lead-benefits ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .lead-benefits li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .lead-benefits li::before {
+            content: "\2713";
+            color: #0f4c75;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .lead-form {
+            padding: 24px 32px 32px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #1a1a2e;
+            background: #fafafa;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .form-group select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #0f4c75;
+            box-shadow: 0 0 0 3px rgba(15, 76, 117, 0.12);
+            background: #fff;
+        }
+
+        .form-group input::placeholder {
+            color: #9ca3af;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #0f4c75, #1b262c);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            margin-top: 8px;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.92;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        .form-note {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 14px;
+            line-height: 1.4;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 48px 32px;
+        }
+
+        .success-message .check-icon {
+            width: 64px;
+            height: 64px;
+            background: #e8f5e9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 28px;
+            color: #2e7d32;
+        }
+
+        .success-message h2 {
+            font-size: 1.3rem;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .success-message p {
+            font-size: 0.9rem;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .powered-by {
+            text-align: center;
+            padding: 16px;
+            font-size: 0.75rem;
+            color: #aaa;
+        }
+
+        .powered-by a {
+            color: #0f4c75;
+            text-decoration: none;
+        }
+
+        @media (max-width: 480px) {
+            .lead-header {
+                padding: 32px 20px 24px;
+            }
+            .lead-header h1 {
+                font-size: 1.35rem;
+            }
+            .lead-benefits,
+            .lead-form {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="lead-container">
+        <div class="lead-header">
+            <span class="icon">&#9878;</span>
+            <h1>Direito da Saúde: Conteúdo Exclusivo para Advogados</h1>
+            <p>Receba análises, decisões judiciais e oportunidades de atuação diretamente no seu e-mail.</p>
+        </div>
+
+        <div class="lead-benefits">
+            <ul>
+                <li>Jurisprudência atualizada sobre planos de saúde e SUS</li>
+                <li>Análises de novas legislações e regulamentações da ANS</li>
+                <li>Modelos de petições e estratégias processuais</li>
+                <li>Oportunidades de networking e eventos da área</li>
+            </ul>
+        </div>
+
+        <form class="lead-form" id="leadForm" action="https://formsubmit.co/renan@vmdadvocacia.com" method="POST">
+            <input type="hidden" name="_subject" value="Novo Lead - Advogado Direito da Saúde">
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_template" value="table">
+            <input type="text" name="_honey" style="display:none">
+
+            <div class="form-group">
+                <label for="nome">Nome completo</label>
+                <input type="text" id="nome" name="Nome Completo" placeholder="Dr(a). Maria Silva" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">E-mail profissional</label>
+                <input type="email" id="email" name="E-mail" placeholder="advogado@escritorio.com.br" required>
+            </div>
+
+            <div class="form-group">
+                <label for="telefone">WhatsApp</label>
+                <input type="tel" id="telefone" name="WhatsApp" placeholder="(11) 99999-9999" required>
+            </div>
+
+            <div class="form-group">
+                <label for="oab">Número da OAB</label>
+                <input type="text" id="oab" name="OAB" placeholder="123.456/SP">
+            </div>
+
+            <div class="form-group">
+                <label for="atuacao">Principal área de atuação em Direito da Saúde</label>
+                <select id="atuacao" name="Area de Atuacao" required>
+                    <option value="" disabled selected>Selecione...</option>
+                    <option value="Planos de Saúde">Planos de Saúde</option>
+                    <option value="Erro Médico">Erro Médico</option>
+                    <option value="Direito ao SUS / Judicialização">Direito ao SUS / Judicialização</option>
+                    <option value="Regulatório (ANS/ANVISA)">Regulatório (ANS/ANVISA)</option>
+                    <option value="Direito Hospitalar">Direito Hospitalar</option>
+                    <option value="Biodireito e Bioética">Biodireito e Bioética</option>
+                    <option value="Direito Farmacêutico">Direito Farmacêutico</option>
+                    <option value="Outro">Outro</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-submit">Quero receber conteúdos exclusivos</button>
+
+            <p class="form-note">Seus dados estão protegidos. Você pode cancelar a qualquer momento.<br>Ao se cadastrar, você concorda com nossa Política de Privacidade.</p>
+        </form>
+
+        <div class="success-message" id="successMessage">
+            <div class="check-icon">&#10003;</div>
+            <h2>Cadastro realizado!</h2>
+            <p>Bem-vindo(a)! Em breve você receberá os melhores conteúdos sobre Direito da Saúde diretamente no seu e-mail.</p>
+        </div>
+    </div>
+
+    <div class="powered-by">
+        <a href="index.html">Mundo em Foco</a>
+    </div>
+
+    <script>
+        // Máscara de telefone
+        document.getElementById('telefone').addEventListener('input', function (e) {
+            let v = e.target.value.replace(/\D/g, '').substring(0, 11);
+            if (v.length > 6) {
+                v = '(' + v.substring(0, 2) + ') ' + v.substring(2, 7) + '-' + v.substring(7);
+            } else if (v.length > 2) {
+                v = '(' + v.substring(0, 2) + ') ' + v.substring(2);
+            } else if (v.length > 0) {
+                v = '(' + v;
+            }
+            e.target.value = v;
+        });
+
+        // Máscara de OAB
+        document.getElementById('oab').addEventListener('input', function (e) {
+            let v = e.target.value.replace(/[^a-zA-Z0-9\/\.]/g, '').toUpperCase();
+            e.target.value = v;
+        });
+
+        // Submit do formulário via AJAX (FormSubmit.co)
+        document.getElementById('leadForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const nome = document.getElementById('nome').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const telefone = document.getElementById('telefone').value.trim();
+            const atuacao = document.getElementById('atuacao').value;
+
+            if (!nome || !email || !telefone || !atuacao) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Por favor, insira um e-mail válido.');
+                return;
+            }
+
+            const btn = form.querySelector('.btn-submit');
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
+
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(function (response) {
+                if (response.ok) {
+                    form.style.display = 'none';
+                    document.querySelector('.lead-benefits').style.display = 'none';
+                    document.getElementById('successMessage').style.display = 'block';
+                } else {
+                    throw new Error('Erro no envio');
+                }
+            })
+            .catch(function () {
+                alert('Ocorreu um erro ao enviar. Tente novamente.');
+                btn.disabled = false;
+                btn.textContent = 'Quero receber conteúdos exclusivos';
+            });
+        });
+    </script>
+
+</body>
+</html>
