@@ -105,7 +105,8 @@
     renderFeatured(articles[0]);
     // Grid começa do artigo 1 (featured ja mostra o 0)
     displayedCount = 0;
-    renderNewsGrid(articles.length > 1 ? articles.slice(1) : articles);
+    const gridArticles = articles.length > 1 ? articles.slice(1) : [];
+    renderNewsGrid(gridArticles);
     renderCategories(allArticles);
   }
 

@@ -13,14 +13,27 @@
     <header class="site-header">
         <div class="container">
             <div class="header-top">
-                <a href="index.html" class="logo"><h1>Mundo em Foco</h1><span class="tagline">Not\u00edcias Nacionais e Internacionais</span></a>
+                <a href="index.html" class="logo"><h1>Mundo em Foco</h1><span class="tagline">Not&#237;cias Nacionais e Internacionais</span></a>
+                <div class="header-actions">
+                    <button class="menu-toggle" id="menuToggle" aria-label="Menu">&#9776;</button>
+                </div>
             </div>
+            <nav class="main-nav" id="mainNav"><ul>
+                <li><a href="index.html">In&#237;cio</a></li>
+                <li><a href="categoria.html?cat=politica">Pol&#237;tica</a></li>
+                <li><a href="categoria.html?cat=economia">Economia</a></li>
+                <li><a href="categoria.html?cat=tecnologia">Tecnologia</a></li>
+                <li><a href="categoria.html?cat=seguranca">Seguran&#231;a</a></li>
+                <li><a href="categoria.html?cat=internacional">Internacional</a></li>
+                <li><a href="categoria.html?cat=negocios">Neg&#243;cios</a></li>
+                <li><a href="categoria.html?cat=geral">Geral</a></li>
+            </ul></nav>
         </div>
     </header>
     <main class="container" style="padding:40px 20px;max-width:800px">
         <article class="article-body">
             <h1 style="font-size:2rem;margin-bottom:20px;font-family:var(--font-sans)">Contato</h1>
-            <p>Tem d\u00favidas, sugest\u00f5es ou deseja reportar algum problema? Entre em contato conosco.</p>
+            <p>Tem d&#250;vidas, sugest&#245;es ou deseja reportar algum problema? Entre em contato conosco.</p>
 
             <h2>E-mail</h2>
             <p>contato@mundoemfoco.com.br</p>
@@ -28,12 +41,30 @@
             <h2>Redes Sociais</h2>
             <p>Em breve estaremos presentes nas principais redes sociais.</p>
 
-            <h2>Hor\u00e1rio de Atendimento</h2>
-            <p>Segunda a sexta, das 9h \u00e0s 18h (hor\u00e1rio de Bras\u00edlia).</p>
+            <h2>Hor&#225;rio de Atendimento</h2>
+            <p>Segunda a sexta, das 9h &#224;s 18h (hor&#225;rio de Bras&#237;lia).</p>
         </article>
     </main>
     <footer class="site-footer">
-        <div class="container"><div class="footer-bottom"><p>&copy; <script>document.write(new Date().getFullYear())</script> Mundo em Foco.</p></div></div>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col"><h3>Mundo em Foco</h3><p>Portal de not&#237;cias nacionais e internacionais em tempo real.</p></div>
+                <div class="footer-col"><h3>Categorias</h3><ul>
+                    <li><a href="categoria.html?cat=politica">Pol&#237;tica</a></li>
+                    <li><a href="categoria.html?cat=economia">Economia</a></li>
+                    <li><a href="categoria.html?cat=tecnologia">Tecnologia</a></li>
+                    <li><a href="categoria.html?cat=internacional">Internacional</a></li>
+                </ul></div>
+                <div class="footer-col"><h3>Institucional</h3><ul>
+                    <li><a href="sobre.html">Sobre n&#243;s</a></li>
+                    <li><a href="politica-privacidade.html">Privacidade</a></li>
+                    <li><a href="termos-de-uso.html">Termos de Uso</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                </ul></div>
+            </div>
+            <div class="footer-bottom"><p>&copy; <span id="currentYear"></span> Mundo em Foco. Todos os direitos reservados.</p></div>
+        </div>
     </footer>
+    <script>document.getElementById('currentYear').textContent=new Date().getFullYear();var t=document.getElementById('menuToggle'),n=document.getElementById('mainNav');if(t&&n)t.addEventListener('click',function(){n.classList.toggle('open')});</script>
 </body>
 </html>
