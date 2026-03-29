@@ -122,12 +122,8 @@
             <label>Token GitHub</label>
             <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
         </div>
-        <div class="form-group">
-            <label>API Key n8n (para automacao)</label>
-            <input type="password" id="n8nApiKey" placeholder="Opcional - para ativar/desativar automacao">
-        </div>
         <button class="btn-publish" onclick="doLogin()">Entrar</button>
-        <p style="margin-top:12px;font-size:.75rem;color:var(--text-muted)">Tokens ficam salvos no navegador (localStorage)</p>
+        <p style="margin-top:12px;font-size:.75rem;color:var(--text-muted)">Token fica salvo no navegador (localStorage)</p>
     </div>
 
     <!-- Editor -->
@@ -139,20 +135,13 @@
             <div class="auto-header">
                 <div>
                     <h2 class="auto-title">Automacao de Noticias</h2>
-                    <p class="auto-desc" id="autoDesc">Carregando status...</p>
-                </div>
-                <div class="auto-toggle">
-                    <label class="switch">
-                        <input type="checkbox" id="autoToggle" onchange="toggleAutomation()">
-                        <span class="slider"></span>
-                    </label>
-                    <span id="autoLabel" class="auto-label">OFF</span>
+                    <p class="auto-desc">Gerencie o workflow de publicacao automatica direto no n8n</p>
                 </div>
             </div>
             <div class="auto-actions">
-                <button class="auto-btn" onclick="runWorkflowNow()">Executar agora</button>
-                <button class="auto-btn secondary" onclick="checkWorkflowStatus()">Atualizar status</button>
-                <span class="auto-stats" id="autoStats"></span>
+                <a class="auto-btn" href="https://renanmenesesadv.app.n8n.cloud/workflow/b8gQZOtuCyIaLCnD" target="_blank" style="text-decoration:none;text-align:center">Abrir Workflow no n8n</a>
+                <a class="auto-btn secondary" href="https://renanmenesesadv.app.n8n.cloud/workflows" target="_blank" style="text-decoration:none;text-align:center">Painel n8n</a>
+                <a class="auto-btn secondary" href="https://renanmenesesadv.github.io/radar-rn-hub/" target="_blank" style="text-decoration:none;text-align:center">Radar Hub (fontes)</a>
             </div>
         </div>
 
