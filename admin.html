@@ -52,15 +52,6 @@
         .auto-header{display:flex;justify-content:space-between;align-items:center}
         .auto-title{font-size:1.1rem;font-weight:700;color:var(--text);margin:0}
         .auto-desc{font-size:.8rem;color:var(--text-muted);margin:4px 0 0}
-        .auto-toggle{display:flex;align-items:center;gap:10px}
-        .auto-label{font-size:.85rem;font-weight:700;color:var(--text-muted)}
-        .auto-label.active{color:var(--success)}
-        .switch{position:relative;display:inline-block;width:50px;height:26px}
-        .switch input{opacity:0;width:0;height:0}
-        .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--border);border-radius:26px;transition:.3s}
-        .slider:before{content:"";position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
-        .switch input:checked+.slider{background:var(--success)}
-        .switch input:checked+.slider:before{transform:translateX(24px)}
         .auto-actions{display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap}
         .auto-btn{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:var(--radius);font-size:.8rem;font-weight:600;cursor:pointer}
         .auto-btn:hover{opacity:.85}
@@ -326,10 +317,7 @@
     // ===== Config =====
     const REPO_OWNER = 'renanmenesesadv';
     const REPO_NAME = 'Portal-Mundo-Flow';
-    const N8N_BASE = 'https://renanmenesesadv.app.n8n.cloud';
-    const WORKFLOW_ID = 'b8gQZOtuCyIaLCnD';
     let githubToken = '';
-    let n8nApiKey = '';
     let tags = [];
     let imageBase64 = '';
     let imageName = '';
@@ -340,35 +328,25 @@
         if (!token) return;
         githubToken = token;
         localStorage.setItem('mf_token', token);
+        showAdmin();
+    }
 
-        const n8nKey = document.getElementById('n8nApiKey')?.value?.trim();
-        if (n8nKey) {
-            n8nApiKey = n8nKey;
-            localStorage.setItem('mf_n8n_key', n8nKey);
-        }
-
+    function showAdmin() {
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('editorScreen').style.display = 'block';
         document.getElementById('adminNav').style.display = 'block';
-        checkWorkflowStatus();
+        loadArticlesList();
     }
 
     // Auto-login
     const saved = localStorage.getItem('mf_token');
-    const savedN8n = localStorage.getItem('mf_n8n_key');
     if (saved) {
         githubToken = saved;
-        if (savedN8n) n8nApiKey = savedN8n;
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('editorScreen').style.display = 'block';
-        document.getElementById('adminNav').style.display = 'block';
-        checkWorkflowStatus();
-        loadArticlesList();
+        showAdmin();
     }
 
     function doLogout() {
         localStorage.removeItem('mf_token');
-        localStorage.removeItem('mf_n8n_key');
         location.reload();
     }
 
@@ -586,82 +564,6 @@
         const el = document.getElementById('statusMsg');
         el.textContent = msg;
         el.className = 'status-msg ' + type;
-    }
-
-    // ===== n8n Automation =====
-    async function n8nFetch(path, method, body) {
-        if (!n8nApiKey) return null;
-        const opts = {
-            method: method || 'GET',
-            headers: { 'X-N8N-API-KEY': n8nApiKey, 'Accept': 'application/json' }
-        };
-        if (body) { opts.body = JSON.stringify(body); opts.headers['Content-Type'] = 'application/json'; }
-        try {
-            const r = await fetch(N8N_BASE + '/api/v1' + path, opts);
-            return r.ok ? r.json() : null;
-        } catch(e) { return null; }
-    }
-
-    async function checkWorkflowStatus() {
-        const desc = document.getElementById('autoDesc');
-        const toggle = document.getElementById('autoToggle');
-        const label = document.getElementById('autoLabel');
-        const stats = document.getElementById('autoStats');
-
-        if (!n8nApiKey) {
-            desc.textContent = 'Insira a API Key do n8n para controlar a automacao';
-            toggle.disabled = true;
-            return;
-        }
-
-        const wf = await n8nFetch('/workflows/' + WORKFLOW_ID);
-        if (!wf) {
-            desc.textContent = 'Nao foi possivel conectar ao n8n';
-            return;
-        }
-
-        const active = wf.active;
-        toggle.checked = active;
-        label.textContent = active ? 'ON' : 'OFF';
-        label.className = 'auto-label' + (active ? ' active' : '');
-        desc.textContent = active ? 'Publicando 2 artigos a cada 30min (6h-0h)' : 'Automacao pausada - artigos so via publicacao manual';
-
-        // Stats
-        const execs = await n8nFetch('/executions?workflowId=' + WORKFLOW_ID + '&limit=5');
-        if (execs && execs.data) {
-            const ok = execs.data.filter(e => e.status === 'success').length;
-            const last = execs.data[0];
-            const lastTime = last ? new Date(last.startedAt).toLocaleString('pt-BR') : '-';
-            stats.textContent = ok + '/5 ultimas OK | Ultima: ' + lastTime;
-        }
-    }
-
-    async function toggleAutomation() {
-        const toggle = document.getElementById('autoToggle');
-        const active = toggle.checked;
-
-        const result = await n8nFetch('/workflows/' + WORKFLOW_ID, 'PATCH', { active });
-        if (result) {
-            checkWorkflowStatus();
-        } else {
-            toggle.checked = !active;
-            alert('Erro ao alterar automacao. Verifique a API Key do n8n.');
-        }
-    }
-
-    async function runWorkflowNow() {
-        const btn = event.target;
-        btn.disabled = true;
-        btn.textContent = 'Executando...';
-
-        const result = await n8nFetch('/workflows/' + WORKFLOW_ID + '/run', 'POST', {});
-        if (result) {
-            btn.textContent = 'Executado!';
-            setTimeout(() => { btn.textContent = 'Executar agora'; btn.disabled = false; }, 3000);
-        } else {
-            btn.textContent = 'Erro';
-            setTimeout(() => { btn.textContent = 'Executar agora'; btn.disabled = false; }, 2000);
-        }
     }
 
     // ===== Articles Manager =====
