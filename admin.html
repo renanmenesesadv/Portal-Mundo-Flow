@@ -459,32 +459,11 @@
             var newState = !data.active;
             var activated = false;
 
-            // Tenta POST /activate ou /deactivate (n8n cloud)
-            try {
-                var action = newState ? 'activate' : 'deactivate';
-                await n8nFetch('/api/v1/workflows/' + WORKFLOW_ID + '/' + action, { method: 'POST' });
-                activated = true;
-            } catch (e1) {}
-
-            // Fallback: PUT com body completo (n8n self-hosted)
-            if (!activated) {
-                try {
-                    data.active = newState;
-                    await n8nFetch('/api/v1/workflows/' + WORKFLOW_ID, {
-                        method: 'PUT',
-                        body: JSON.stringify(data)
-                    });
-                    activated = true;
-                } catch (e2) {}
-            }
-
-            // Fallback: PATCH (n8n >= 1.x)
-            if (!activated) {
-                await n8nFetch('/api/v1/workflows/' + WORKFLOW_ID, {
-                    method: 'PATCH',
-                    body: JSON.stringify({ active: newState })
-                });
-            }
+            // PATCH /api/v1/workflows/{id} (n8n cloud + self-hosted >= 1.x)
+            await n8nFetch('/api/v1/workflows/' + WORKFLOW_ID, {
+                method: 'PATCH',
+                body: JSON.stringify({ active: newState })
+            });
 
             updateAutoUI(newState);
             showAutoMsg(newState ? 'Automacao LIGADA com sucesso!' : 'Automacao DESLIGADA.', newState ? 'success' : 'error');
@@ -503,19 +482,11 @@
         try {
             if (!n8nApiKey) throw new Error('Insira a API Key do n8n');
 
-            // Tenta POST /executions (n8n >= 1.x)
-            try {
-                await n8nFetch('/api/v1/executions', {
-                    method: 'POST',
-                    body: JSON.stringify({ workflowId: WORKFLOW_ID })
-                });
-            } catch (e1) {
-                // Fallback: POST /workflows/{id}/run (algumas versoes)
-                await n8nFetch('/api/v1/workflows/' + WORKFLOW_ID + '/run', {
-                    method: 'POST',
-                    body: JSON.stringify({})
-                });
-            }
+            // POST /api/v1/executions (n8n cloud + self-hosted >= 1.x)
+            await n8nFetch('/api/v1/executions', {
+                method: 'POST',
+                body: JSON.stringify({ workflowId: WORKFLOW_ID })
+            });
 
             showAutoMsg('Workflow executado! Novos artigos em 2-3 minutos.', 'success');
         } catch (e) {
