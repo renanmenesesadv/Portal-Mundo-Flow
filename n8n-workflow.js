@@ -1,10 +1,19 @@
 /**
  * ============================================================
- * WORKFLOW N8N - Mundo Flow Notícias - Auto Publisher v2
+ * WORKFLOW N8N - Mundo Flow Notícias - Auto Publisher v3
  * ============================================================
  * Motor: Claude Sonnet 4.5 (Anthropic)
  * Imagens: Extraidas das fontes originais com creditos
  * Conteudo: Reescrito com voz editorial propria do portal
+ * SEO: Keywords primaria + suporte geradas pelo Claude
+ *
+ * MELHORIAS v3:
+ * - Structured Output Parser (JSON confiavel)
+ * - Accumulator pattern (metadados preservados atraves do LLM)
+ * - Validacao antes de publicar
+ * - Retry automatico no Claude (3 tentativas)
+ * - Author assignment por categoria
+ * - Merge corrigido (bifurcacao via staticData)
  *
  * SETUP:
  * 1. Crie credencial "Anthropic Claude" no n8n (sua API key)
@@ -77,7 +86,6 @@ for (const feed of feeds) {
       const description = getTag('description').replace(/<[^>]*>/g, '').substring(0, 300);
       const pubDate = getTag('pubDate');
 
-      // Extrair imagem do feed (media:content, enclosure, ou img no description)
       let image = '';
       const mediaMatch = item.match(/url="(https?:\\/\\/[^"]+\\.(?:jpg|jpeg|png|webp)[^"]*)"/i);
       if (mediaMatch) image = mediaMatch[1];
@@ -96,7 +104,7 @@ for (const feed of feeds) {
         });
       }
     }
-  } catch (e) { /* skip */ }
+  } catch (e) { /* skip feed */ }
 }
 
 // Selecionar 5 noticias variadas (1 por fonte, mais recentes)
@@ -112,7 +120,7 @@ for (const item of sorted) {
   }
 }
 
-return selected.length > 0 ? selected : [{ json: { error: 'Nenhuma noticia' } }];
+return selected.length > 0 ? selected : [{ json: { error: 'Nenhuma noticia encontrada nos feeds' } }];
 `
     },
     position: [480, 300]
@@ -136,19 +144,16 @@ const results = [];
 for (const item of items) {
   const data = { ...item.json };
 
-  // Se ja tem imagem do RSS, usa ela
   if (data.image) {
     data.imageCredit = 'Foto: ' + data.source;
     results.push({ json: data });
     continue;
   }
 
-  // Senao, tenta buscar og:image da pagina original
   try {
     const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(data.link);
     const html = await $helpers.httpRequest({ method: 'GET', url: proxyUrl, timeout: 10000 });
 
-    // Buscar og:image
     const ogMatch = html.match(/property="og:image"[^>]*content="([^"]+)"/i) ||
                      html.match(/content="([^"]+)"[^>]*property="og:image"/i);
     if (ogMatch) {
@@ -156,7 +161,6 @@ for (const item of items) {
       data.imageCredit = 'Foto: Reproducao/' + data.source;
     }
 
-    // Buscar twitter:image como fallback
     if (!data.image) {
       const twMatch = html.match(/name="twitter:image"[^>]*content="([^"]+)"/i);
       if (twMatch) {
@@ -182,7 +186,45 @@ return results;
   output: [{ title: 'Noticia', link: 'https://example.com', description: 'Desc', source: 'Metropoles', category: 'geral', image: 'https://example.com/og.jpg', imageCredit: 'Foto: Reproducao/Metropoles' }]
 });
 
-// ===== 4. CLAUDE - Reescrever artigo com voz propria =====
+// ===== 4. SALVAR METADADOS (Accumulator - preserva dados atraves do LLM) =====
+const saveMetadata = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: {
+    name: 'Salvar Metadados (Accumulator)',
+    parameters: {
+      mode: 'runOnceForAllItems',
+      language: 'javaScript',
+      jsCode: `
+const data = $getWorkflowStaticData('global');
+const items = $input.all();
+
+// Armazena metadados por URL da fonte (chave unica)
+data.articleMetadata = {};
+
+for (const item of items) {
+  const key = item.json.link || '';
+  if (key) {
+    data.articleMetadata[key] = {
+      image: item.json.image || '',
+      imageCredit: item.json.imageCredit || '',
+      source: item.json.source || '',
+      category: item.json.category || '',
+      link: item.json.link || '',
+      pubDate: item.json.pubDate || ''
+    };
+  }
+}
+
+return items;
+`
+    },
+    position: [960, 300]
+  },
+  output: [{ title: 'Noticia', link: 'https://example.com', source: 'Metropoles', image: 'https://example.com/og.jpg', imageCredit: 'Foto: Reproducao/Metropoles' }]
+});
+
+// ===== 5. CLAUDE LLM =====
 const claudeModel = languageModel({
   type: '@n8n/n8n-nodes-langchain.lmChatAnthropic',
   version: 1.3,
@@ -192,95 +234,147 @@ const claudeModel = languageModel({
       model: { __rl: true, mode: 'list', value: 'claude-sonnet-4-5-20250929', cachedResultName: 'Claude Sonnet 4.5' },
       options: {
         maxTokensToSample: 3000,
-        temperature: 0.75
+        temperature: 0.7
       }
     },
     credentials: { anthropicApi: newCredential('Anthropic Claude') },
-    position: [960, 500]
+    position: [1200, 600]
   }
 });
 
+// ===== 6. STRUCTURED OUTPUT PARSER (garante JSON valido) =====
+const articleParser = node({
+  type: '@n8n/n8n-nodes-langchain.outputParserStructured',
+  version: 1.3,
+  config: {
+    name: 'Article Parser',
+    parameters: {
+      jsonSchemaExample: JSON.stringify({
+        title: "Titulo SEO atraente 55-65 caracteres",
+        slug: "slug-seo-sem-acentos-max-60-chars",
+        excerpt: "Resumo provocativo 140-155 caracteres que faca o leitor querer ler",
+        body: "<h2>Subtitulo contextual</h2><p>Paragrafo de abertura forte...</p><h2>O que esperar</h2><p>Perspectiva...</p>",
+        category: "politica",
+        tags: ["tag1", "tag2", "tag3", "tag4", "tag5"],
+        source: "BBC Brasil",
+        sourceUrl: "https://example.com/artigo-original",
+        primaryKeyword: "palavra-chave-principal-seo",
+        supportingKeywords: ["keyword-apoio-1", "keyword-apoio-2", "keyword-apoio-3"]
+      })
+    },
+    position: [1380, 600]
+  }
+});
+
+// ===== 7. CLAUDE - Reescrever artigo com voz propria + SEO =====
 const generateArticle = node({
-  type: '@n8n/n8n-nodes-langchain.chainLlm',
-  version: 1.9,
+  type: '@n8n/n8n-nodes-langchain.agent',
+  version: 2.2,
   config: {
     name: 'Reescrever com Voz do Portal',
+    retryOnFail: true,
+    maxTries: 3,
+    waitBetweenTries: 3000,
     parameters: {
       promptType: 'define',
       text: expr(
-        'Voce e o redator-chefe do portal "Mundo Flow Notícias", um site de noticias brasileiro com linguagem propria: ' +
-        'acessivel, direta, levemente opinativa quando pertinente, e sempre contextualizando os fatos para o leitor brasileiro. ' +
-        'Voce NAO replica noticias - voce REESCREVE com analise, contexto e a voz editorial unica do Mundo Flow Notícias.\n\n' +
         'NOTICIA DE REFERENCIA (fonte: {{ $json.source }}):\n' +
         'Titulo original: {{ $json.title }}\n' +
         'Resumo: {{ $json.description }}\n' +
         'Categoria: {{ $json.category }}\n' +
-        'Link fonte: {{ $json.link }}\n' +
-        'Credito imagem: {{ $json.imageCredit }}\n\n' +
-        'DIRETRIZES EDITORIAIS DO MUNDO EM FOCO:\n' +
-        '- Reescreva COMPLETAMENTE. Nao copie frases da fonte original\n' +
-        '- Adicione CONTEXTO: por que isso importa para o brasileiro?\n' +
-        '- Use linguagem acessivel mas profissional, como se explicasse para um amigo inteligente\n' +
-        '- Inclua uma analise breve ou perspectiva no final ("O que esperar")\n' +
-        '- Subtitulos devem ser informativos, nao genericos\n' +
-        '- Paragrafos curtos (2-3 frases) para facilitar leitura em celular\n' +
-        '- Se for noticia internacional, SEMPRE contextualize o impacto no Brasil\n' +
-        '- Palavras-chave SEO devem aparecer naturalmente, nunca forcadas\n\n' +
-        'FORMATO DE RESPOSTA (JSON puro, sem markdown):\n' +
-        '{\n' +
-        '  "title": "Titulo SEO atraente 55-65 chars, voz propria, nao copie o original",\n' +
-        '  "slug": "slug-seo-sem-acentos-max-60-chars",\n' +
-        '  "excerpt": "Resumo provocativo 140-155 chars que faca o leitor querer ler",\n' +
-        '  "body": "<h2>Subtitulo contextual</h2><p>Paragrafo de abertura forte...</p><h2>Outro subtitulo</h2><p>Analise...</p><h2>O que esperar</h2><p>Perspectiva...</p>",\n' +
-        '  "category": "{{ $json.category }}",\n' +
-        '  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],\n' +
-        '  "source": "{{ $json.source }}",\n' +
-        '  "sourceUrl": "{{ $json.link }}"\n' +
-        '}'
-      )
+        'Link fonte: {{ $json.link }}\n\n' +
+        'Reescreva esta noticia seguindo as diretrizes editoriais do sistema.'
+      ),
+      hasOutputParser: true,
+      options: {
+        systemMessage:
+          'Voce e o redator-chefe do portal "Mundo Flow Noticias", um site de noticias brasileiro com linguagem propria: ' +
+          'acessivel, direta, levemente opinativa quando pertinente, e sempre contextualizando os fatos para o leitor brasileiro.\n\n' +
+          'DIRETRIZES EDITORIAIS:\n' +
+          '- Reescreva COMPLETAMENTE. Nao copie frases da fonte original\n' +
+          '- Adicione CONTEXTO: por que isso importa para o brasileiro?\n' +
+          '- Use linguagem acessivel mas profissional, como se explicasse para um amigo inteligente\n' +
+          '- Inclua uma analise breve ou perspectiva no final ("O que esperar")\n' +
+          '- Subtitulos devem ser informativos, nao genericos\n' +
+          '- Paragrafos curtos (2-3 frases) para facilitar leitura em celular\n' +
+          '- Se for noticia internacional, SEMPRE contextualize o impacto no Brasil\n\n' +
+          'REGRAS SEO:\n' +
+          '- Identifique a palavra-chave principal (primaryKeyword) que um usuario buscaria no Google\n' +
+          '- Identifique 3 palavras-chave de apoio (supportingKeywords) relacionadas\n' +
+          '- O titulo DEVE conter a primaryKeyword naturalmente\n' +
+          '- Use as keywords no body de forma natural, nunca forcada\n' +
+          '- Titulo SEO: 55-65 caracteres, voz propria, nao copie o original\n' +
+          '- Excerpt: 140-155 caracteres, provocativo, que faca o leitor querer ler\n\n' +
+          'REGRAS DO BODY HTML:\n' +
+          '- Use tags <h2> para subtitulos e <p> para paragrafos\n' +
+          '- Minimo 3 subtitulos (h2) para estruturar o artigo\n' +
+          '- Ultimo subtitulo deve ser "O que esperar" com perspectiva/analise\n' +
+          '- Tamanho ideal: 400-600 palavras no body\n\n' +
+          'IMPORTANTE:\n' +
+          '- O campo "source" deve ser exatamente o nome da fonte recebida\n' +
+          '- O campo "sourceUrl" deve ser exatamente o link da fonte recebida\n' +
+          '- O campo "category" deve ser exatamente a categoria recebida\n' +
+          '- O campo "slug" deve ser sem acentos, apenas letras minusculas, numeros e hifens\n' +
+          '- O campo "tags" deve conter exatamente 5 tags relevantes em portugues'
+      }
     },
-    subnodes: { model: claudeModel },
-    position: [960, 300]
+    subnodes: { model: claudeModel, outputParser: articleParser },
+    position: [1200, 300]
   },
-  output: [{ text: '{"title":"Artigo","slug":"artigo","excerpt":"Resumo","body":"<p>Corpo</p>","category":"geral","tags":["tag1"],"source":"Fonte","sourceUrl":"https://example.com"}' }]
+  output: [{ output: { title: 'Artigo', slug: 'artigo', excerpt: 'Resumo', body: '<p>Corpo</p>', category: 'geral', tags: ['tag1'], source: 'Fonte', sourceUrl: 'https://example.com', primaryKeyword: 'keyword', supportingKeywords: ['kw1'] } }]
 });
 
-// ===== 5. PROCESSAR ARTIGO + IMAGEM =====
-const processArticle = node({
+// ===== 8. MONTAR ARTIGO FINAL (restaura metadados + valida + formata) =====
+const buildArticle = node({
   type: 'n8n-nodes-base.code',
   version: 2,
   config: {
-    name: 'Montar Artigo Final com Imagem e Creditos',
+    name: 'Montar e Validar Artigo Final',
     parameters: {
       mode: 'runOnceForAllItems',
       language: 'javaScript',
       jsCode: `
+const data = $getWorkflowStaticData('global');
+const metadata = data.articleMetadata || {};
 const items = $input.all();
 const results = [];
 
+// Mapa de autores por categoria
+const authorMap = {
+  politica: 'Renan Meneses',
+  economia: 'Renan Meneses',
+  tecnologia: 'Renan Meneses',
+  negocios: 'Renan Meneses',
+  internacional: 'Ana Claudia Barbalho',
+  seguranca: 'Ana Claudia Barbalho',
+  geral: 'Ana Claudia Barbalho'
+};
+
 for (const item of items) {
   try {
-    const raw = item.json.text || item.json.output || JSON.stringify(item.json);
+    // O output parser garante JSON valido em item.json.output
+    const article = item.json.output || item.json;
 
-    let cleaned = raw.replace(/\\\`\\\`\\\`json\\n?|\\n?\\\`\\\`\\\`/g, '').trim();
-    const jsonStart = cleaned.indexOf('{');
-    const jsonEnd = cleaned.lastIndexOf('}');
-    if (jsonStart >= 0 && jsonEnd > jsonStart) {
-      cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
-    }
+    // === VALIDACAO ===
+    if (!article.title || article.title.length < 10) continue;
+    if (!article.body || article.body.length < 100) continue;
+    if (!article.slug) continue;
+    if (!article.source) continue;
 
-    const article = JSON.parse(cleaned);
     const now = new Date().toISOString();
 
-    // Slug unico
-    const baseSlug = (article.slug || article.title || 'artigo').toLowerCase()
+    // Slug unico com timestamp
+    const baseSlug = (article.slug || '')
+      .toLowerCase()
       .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
       .substring(0, 60);
+    const slug = baseSlug + '-' + Date.now().toString(36);
 
-    // Recuperar imagem e credito
-    const image = item.json.image || '';
-    const imageCredit = item.json.imageCredit || '';
+    // === RESTAURAR METADADOS DO ACCUMULATOR ===
+    const meta = metadata[article.sourceUrl] || {};
+    const image = meta.image || '';
+    const imageCredit = meta.imageCredit || '';
 
     // Inserir imagem com credito no corpo
     let body = article.body || '';
@@ -289,37 +383,80 @@ for (const item of items) {
     }
 
     // Atribuicao de fonte no final
-    body += '<p class="article-attribution"><em>Com informacoes de ' + (article.source || 'agencias') + '. Reportagem reescrita e contextualizada pela equipe Mundo Flow Notícias.</em></p>';
+    body += '<p class="article-attribution"><em>Com informacoes de ' + (article.source || 'agencias') + '. Reportagem reescrita e contextualizada pela equipe Mundo Flow Noticias.</em></p>';
+
+    // Author baseado na categoria
+    const category = article.category || 'geral';
+    const author = authorMap[category] || 'Redacao Mundo Flow';
 
     results.push({
       json: {
-        title: article.title || 'Sem titulo',
-        slug: baseSlug + '-' + Date.now().toString(36),
+        title: article.title,
+        slug: slug,
         excerpt: article.excerpt || '',
         body: body,
-        category: article.category || 'geral',
-        tags: article.tags || [],
+        category: category,
+        tags: Array.isArray(article.tags) ? article.tags.slice(0, 5) : [],
         source: article.source || '',
         sourceUrl: article.sourceUrl || '',
+        author: author,
         date: now,
         dateModified: now,
         readTime: Math.max(2, Math.ceil(body.replace(/<[^>]*>/g, '').split(/\\s+/).length / 200)) + ' min',
         image: image,
-        imageCredit: imageCredit
+        imageCredit: imageCredit,
+        primaryKeyword: article.primaryKeyword || '',
+        supportingKeywords: article.supportingKeywords || []
       }
     });
-  } catch (e) { /* skip */ }
+  } catch (e) {
+    // Artigo invalido, pula
+  }
 }
 
-return results.length > 0 ? results : [{ json: { error: 'Nenhum artigo processado' } }];
+if (results.length === 0) {
+  return [{ json: { error: 'Nenhum artigo passou na validacao', totalRecebidos: items.length } }];
+}
+
+return results;
 `
     },
-    position: [1200, 300]
+    position: [1500, 300]
   },
-  output: [{ title: 'Artigo', slug: 'artigo-abc', body: '<figure>...</figure><p>Corpo</p>', category: 'geral', image: 'https://img.com/x.jpg', imageCredit: 'Foto: Reproducao/Fonte', date: '2026-03-29T00:00:00Z', readTime: '3 min' }]
+  output: [{ title: 'Artigo', slug: 'artigo-abc123', body: '<figure>...</figure><p>Corpo</p>', category: 'geral', author: 'Renan Meneses', image: 'https://img.com/x.jpg', imageCredit: 'Foto: Reproducao/Fonte', date: '2026-03-29T00:00:00Z', readTime: '3 min' }]
 });
 
-// ===== 6. LER ARTICLES.JSON DO GITHUB =====
+// ===== 9. GUARDAR ARTIGOS NOVOS NO STATIC DATA (antes do GitHub sobrescrever) =====
+const storeNewArticles = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: {
+    name: 'Guardar Artigos Novos',
+    parameters: {
+      mode: 'runOnceForAllItems',
+      language: 'javaScript',
+      jsCode: `
+const data = $getWorkflowStaticData('global');
+const items = $input.all();
+
+// Filtra apenas artigos validos (sem campo error)
+const validArticles = items
+  .map(i => i.json)
+  .filter(a => a.title && a.slug && !a.error);
+
+// Guarda no staticData para o merge recuperar depois
+data.newArticles = validArticles;
+
+// Passa adiante para o proximo node (GitHub read)
+return items;
+`
+    },
+    position: [1740, 300]
+  },
+  output: [{ title: 'Artigo', slug: 'artigo-abc123' }]
+});
+
+// ===== 10. LER ARTICLES.JSON DO GITHUB =====
 const getArticlesJson = node({
   type: 'n8n-nodes-base.github',
   version: 1.1,
@@ -335,12 +472,12 @@ const getArticlesJson = node({
     },
     credentials: { githubApi: newCredential('GitHub Personal Token') },
     onError: 'continueErrorOutput',
-    position: [1440, 300]
+    position: [1980, 300]
   },
   output: [{ content: 'W10=' }]
 });
 
-// ===== 7. MERGE NOVOS + EXISTENTES =====
+// ===== 11. MERGE: ARTIGOS NOVOS (staticData) + EXISTENTES (GitHub) =====
 const mergeArticles = node({
   type: 'n8n-nodes-base.code',
   version: 2,
@@ -350,40 +487,75 @@ const mergeArticles = node({
       mode: 'runOnceForAllItems',
       language: 'javaScript',
       jsCode: `
+const data = $getWorkflowStaticData('global');
 const items = $input.all();
-let existingArticles = [];
-let newArticles = [];
 
+// === ARTIGOS NOVOS: recuperar do staticData (preservados da bifurcacao) ===
+const newArticles = data.newArticles || [];
+
+// === ARTIGOS EXISTENTES: decodificar do GitHub ===
+let existingArticles = [];
 for (const item of items) {
   if (item.json.content) {
     try {
       const decoded = Buffer.from(item.json.content, 'base64').toString('utf-8');
       existingArticles = JSON.parse(decoded);
-    } catch (e) { existingArticles = []; }
-  } else if (item.json.title && item.json.slug) {
-    newArticles.push(item.json);
+      if (!Array.isArray(existingArticles)) existingArticles = [];
+    } catch (e) {
+      existingArticles = [];
+    }
+    break;
   }
 }
 
+// === MERGE: sem duplicatas por slug ===
 const existingSlugs = new Set(existingArticles.map(a => a.slug));
-const uniqueNew = newArticles.filter(a => !existingSlugs.has(a.slug));
-const allArticles = [...uniqueNew, ...existingArticles].slice(0, 200);
+
+// Tambem checa por titulo similar para evitar mesma noticia com slug diferente
+const existingTitles = new Set(
+  existingArticles.map(a => (a.title || '').toLowerCase().substring(0, 40))
+);
+
+const uniqueNew = newArticles.filter(a => {
+  if (existingSlugs.has(a.slug)) return false;
+  const titleKey = (a.title || '').toLowerCase().substring(0, 40);
+  if (existingTitles.has(titleKey)) return false;
+  return true;
+});
+
+// Novos primeiro (mais recentes no topo), maximo 300 artigos
+const allArticles = [...uniqueNew, ...existingArticles].slice(0, 300);
+
+// Limpar staticData
+delete data.newArticles;
+delete data.articleMetadata;
+
+if (uniqueNew.length === 0) {
+  return [{ json: {
+    articlesJson: JSON.stringify(allArticles, null, 2),
+    articleCount: allArticles.length,
+    newCount: 0,
+    skipped: true,
+    message: 'Nenhum artigo novo (todos duplicados)'
+  }}];
+}
 
 return [{
   json: {
     articlesJson: JSON.stringify(allArticles, null, 2),
     articleCount: allArticles.length,
-    newCount: uniqueNew.length
+    newCount: uniqueNew.length,
+    skipped: false
   }
 }];
 `
     },
-    position: [1680, 300]
+    position: [2220, 300]
   },
-  output: [{ articlesJson: '[]', articleCount: 0, newCount: 0 }]
+  output: [{ articlesJson: '[]', articleCount: 0, newCount: 0, skipped: false }]
 });
 
-// ===== 8. COMMIT NO GITHUB =====
+// ===== 12. COMMIT NO GITHUB =====
 const updateGitHub = node({
   type: 'n8n-nodes-base.github',
   version: 1.1,
@@ -396,10 +568,10 @@ const updateGitHub = node({
       repository: { __rl: true, mode: 'name', value: placeholder('Portal-Mundo-Flow') },
       filePath: 'data/articles.json',
       fileContent: expr('{{ $json.articlesJson }}'),
-      commitMessage: expr('Publicar {{ $json.newCount }} artigos - Mundo Flow Notícias (total: {{ $json.articleCount }})')
+      commitMessage: expr('Publicar {{ $json.newCount }} artigos - Mundo Flow Noticias (total: {{ $json.articleCount }})')
     },
     credentials: { githubApi: newCredential('GitHub Personal Token') },
-    position: [1920, 300]
+    position: [2460, 300]
   },
   output: [{ commit: { sha: 'abc123' } }]
 });
@@ -414,24 +586,45 @@ const noteSetup = sticky(
   [scheduleTrigger], { color: 4 }
 );
 
-const noteFlow = sticky(
-  '## Como Funciona\\n\\n' +
-  '1. Busca 9 feeds RSS (Metropoles, Poder360, BBC, NYT, CNN, InfoMoney...)\\n' +
-  '2. Extrai imagens originais (RSS + og:image da fonte)\\n' +
-  '3. Claude reescreve com voz propria do Mundo Flow Notícias\\n' +
-  '4. Adiciona credito de imagem + atribuicao de fonte\\n' +
-  '5. Merge com artigos existentes + commit no GitHub\\n' +
-  '6. GitHub Pages publica automaticamente',
+const noteBugs = sticky(
+  '## Melhorias v3\\n\\n' +
+  '**Bugs corrigidos:**\\n' +
+  '- Metadados (imagem/credito) preservados via Accumulator pattern\\n' +
+  '- Artigos novos nao se perdem mais no GitHub read (staticData)\\n' +
+  '- Deduplicacao por slug + titulo similar\\n\\n' +
+  '**Novidades:**\\n' +
+  '- Structured Output Parser → JSON sempre valido\\n' +
+  '- Retry automatico (3x) se Claude falhar\\n' +
+  '- Validacao: titulo, body, slug obrigatorios\\n' +
+  '- Author atribuido por categoria\\n' +
+  '- SEO keywords integradas (primaryKeyword + supporting)\\n' +
+  '- Limite aumentado para 300 artigos',
   [generateArticle], { color: 6 }
 );
 
+const noteFlow = sticky(
+  '## Fluxo v3\\n\\n' +
+  '1. Busca 9 feeds RSS\\n' +
+  '2. Extrai imagens (RSS + og:image)\\n' +
+  '3. **Salva metadados** no Accumulator\\n' +
+  '4. Claude reescreve + gera SEO keywords\\n' +
+  '5. **Restaura metadados** + valida artigo\\n' +
+  '6. **Guarda artigos** no staticData\\n' +
+  '7. Le articles.json do GitHub\\n' +
+  '8. **Merge inteligente** (staticData + GitHub)\\n' +
+  '9. Commit no GitHub Pages',
+  [mergeArticles], { color: 2 }
+);
+
 // ===== WORKFLOW =====
-export default workflow('mundo-em-foco-publisher', 'Mundo Flow Notícias - Auto Publisher')
+export default workflow('mundo-em-foco-publisher-v3', 'Mundo Flow Noticias - Auto Publisher v3')
   .add(scheduleTrigger)
   .to(extractNews)
   .to(fetchSourceImage)
+  .to(saveMetadata)
   .to(generateArticle)
-  .to(processArticle)
+  .to(buildArticle)
+  .to(storeNewArticles)
   .to(getArticlesJson)
   .to(mergeArticles)
   .to(updateGitHub);
