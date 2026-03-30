@@ -1,0 +1,7 @@
+services:
+  portal-mundo-flow:
+    build: .
+    container_name: portal-mundo-flow
+    ports:
+      - "8091:80"
+    restart: unless-stopped

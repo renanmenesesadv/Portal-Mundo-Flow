@@ -363,7 +363,7 @@
     // ===== Config =====
     const REPO_OWNER = 'renanmenesesadv';
     const REPO_NAME = 'Portal-Mundo-Flow';
-    const N8N_BASE = 'https://renanmenesesadv.app.n8n.cloud';
+    const N8N_BASE = '/proxy/n8n';
     const WORKFLOW_ID = 'b8gQZOtuCyIaLCnD';
     let githubToken = '';
     let n8nApiKey = '';
@@ -731,7 +731,7 @@
 
     // ===== GitHub API =====
     async function githubGetFile(path) {
-        const resp = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + path, {
+        const resp = await fetch('/proxy/github/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + path, {
             headers: { 'Authorization': 'token ' + githubToken, 'Accept': 'application/vnd.github+json' }
         });
         if (!resp.ok) throw new Error('Falha ao ler ' + path);
@@ -742,7 +742,7 @@
         const body = { message, content };
         if (sha) body.sha = sha;
 
-        const resp = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + path, {
+        const resp = await fetch('/proxy/github/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + path, {
             method: 'PUT',
             headers: { 'Authorization': 'token ' + githubToken, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
