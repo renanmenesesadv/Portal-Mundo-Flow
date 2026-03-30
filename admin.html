@@ -412,6 +412,24 @@
         document.getElementById('editorArea').focus();
     }
 
+    // Strip inline styles on paste
+    document.addEventListener('DOMContentLoaded', function() {
+        ['editorArea', 'editBody'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.addEventListener('paste', function(e) {
+                e.preventDefault();
+                var text = (e.clipboardData || window.clipboardData).getData('text/html');
+                if (!text) text = (e.clipboardData || window.clipboardData).getData('text/plain');
+                // Strip style attributes, class attributes, and span tags
+                text = text.replace(/\s*style="[^"]*"/gi, '');
+                text = text.replace(/\s*class="[^"]*"/gi, '');
+                text = text.replace(/<span[^>]*>([\s\S]*?)<\/span>/gi, '$1');
+                text = text.replace(/<font[^>]*>([\s\S]*?)<\/font>/gi, '$1');
+                document.execCommand('insertHTML', false, text);
+            });
+        });
+    });
+
     // ===== Preview =====
     function previewArticle() {
         const panel = document.getElementById('previewPanel');
@@ -467,7 +485,7 @@
             // 2. Get existing articles
             const existing = await githubGetFile('data/articles.json');
             let articles = [];
-            try { articles = JSON.parse(atob(existing.content.replace(/\n/g, ''))); } catch(e) { articles = []; }
+            try { articles = JSON.parse(decodeURIComponent(escape(atob(existing.content.replace(/\n/g, ''))))); } catch(e) { articles = []; }
 
             // 3. Build article
             const now = new Date().toISOString();
@@ -556,7 +574,7 @@
         try {
             const file = await githubGetFile('data/articles.json');
             articlesFileSha = file.sha;
-            allArticlesData = JSON.parse(atob(file.content.replace(/\n/g, '')));
+            allArticlesData = JSON.parse(decodeURIComponent(escape(atob(file.content.replace(/\n/g, '')))));
             renderArticlesList(allArticlesData);
         } catch(e) {
             list.innerHTML = '<p style="color:var(--accent);text-align:center;padding:20px">Erro ao carregar artigos</p>';
