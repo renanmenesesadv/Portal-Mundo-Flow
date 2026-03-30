@@ -51,28 +51,9 @@
         .char-count{font-size:.7rem;color:var(--text-muted);text-align:right;margin-top:2px}
         .admin-login{max-width:400px;margin:100px auto;text-align:center}
         .admin-login h2{margin-bottom:20px}
-        .automation-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px}
-        .auto-header{display:flex;justify-content:space-between;align-items:center}
-        .auto-title{font-size:1.1rem;font-weight:700;color:var(--text);margin:0}
-        .auto-desc{font-size:.8rem;color:var(--text-muted);margin:4px 0 0}
-        .auto-actions{display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap}
         .auto-btn{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:var(--radius);font-size:.8rem;font-weight:600;cursor:pointer}
         .auto-btn:hover{opacity:.85}
         .auto-btn.secondary{background:var(--primary-light);color:var(--text);border:1px solid var(--border)}
-        .auto-btn:disabled{opacity:.5;cursor:not-allowed}
-        .auto-key-row{margin-top:12px;padding:10px;background:var(--primary-light);border:1px solid var(--border);border-radius:var(--radius)}
-        .auto-key-row.hidden{display:none}
-        .auto-key-saved{font-size:.75rem;color:#00d4aa;margin-top:8px;display:flex;align-items:center;gap:6px}
-        .auto-key-saved button{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.7rem;text-decoration:underline}
-        .auto-controls{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-        .toggle-btn{min-width:180px;display:flex;align-items:center;justify-content:center;gap:6px}
-        .toggle-btn.active{background:#00d4aa}
-        .auto-status{display:flex;align-items:center;gap:6px}
-        .status-dot{width:10px;height:10px;border-radius:50%;background:var(--text-muted);display:inline-block}
-        .status-dot.on{background:#00d4aa;box-shadow:0 0 6px #00d4aa}
-        .status-dot.off{background:#e53e3e}
-        .status-label{font-size:.8rem;font-weight:600;color:var(--text-muted)}
-        .auto-stats{font-size:.75rem;color:var(--text-muted);margin-left:auto}
         .admin-nav{background:var(--primary-light);border-bottom:1px solid var(--border);position:sticky;top:52px;z-index:50}
         .admin-nav ul{display:flex;list-style:none;max-width:900px;margin:0 auto;padding:0}
         .admin-nav a{display:block;padding:12px 20px;font-size:.85rem;font-weight:600;color:var(--text-muted);transition:all .2s;border-bottom:2px solid transparent}
@@ -98,7 +79,7 @@
         .edit-modal-content{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto}
         .edit-modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
         .edit-modal-header h3{font-size:1.2rem;color:var(--accent)}
-        @media(max-width:768px){.form-row,.form-row-3{grid-template-columns:1fr}.auto-header{flex-direction:column;gap:12px;align-items:flex-start}.manager-filter{flex-direction:column}.article-row{flex-direction:column;align-items:flex-start}}
+        @media(max-width:768px){.form-row,.form-row-3{grid-template-columns:1fr}.manager-filter{flex-direction:column}.article-row{flex-direction:column;align-items:flex-start}}
     </style>
     <script src="js/adsense.js"></script>
 </head>
@@ -114,8 +95,7 @@
     <!-- Menu Admin -->
     <nav class="admin-nav" id="adminNav" style="display:none">
         <ul>
-            <li><a href="#secAutomacao" class="active">Automacao</a></li>
-            <li><a href="#secEditor">Novo Artigo</a></li>
+            <li><a href="#secEditor" class="active">Novo Artigo</a></li>
             <li><a href="#secGestao">Artigos Publicados</a></li>
             <li><a href="index.html" target="_blank" style="color:var(--success)">Ver Site</a></li>
             <li><a href="#" onclick="doLogout()" style="color:var(--accent)">Sair</a></li>
@@ -129,60 +109,12 @@
             <label>Token GitHub</label>
             <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
         </div>
-        <div class="form-group">
-            <label>API Key n8n <span style="font-weight:400;color:var(--text-muted)">(para automacao)</span></label>
-            <input type="password" id="n8nToken" placeholder="n8n_api_xxxxxxxxxxxx">
-        </div>
         <button class="btn-publish" onclick="doLogin()">Entrar</button>
         <p style="margin-top:12px;font-size:.75rem;color:var(--text-muted)">Token fica salvo no navegador (localStorage)</p>
     </div>
 
     <!-- Editor -->
     <div id="editorScreen" class="admin-container" style="display:none">
-
-        <!-- Painel de Automacao -->
-        <div class="admin-section" id="secAutomacao">
-        <div class="automation-panel" id="automationPanel">
-            <div class="auto-header">
-                <div>
-                    <h2 class="auto-title">Automacao de Noticias</h2>
-                    <p class="auto-desc">Controle o workflow de publicacao automatica</p>
-                </div>
-                <div class="auto-status" id="autoStatus">
-                    <span class="status-dot" id="statusDot"></span>
-                    <span class="status-label" id="statusLabel">Verificando...</span>
-                </div>
-            </div>
-
-            <div class="auto-key-row" id="n8nKeyRow">
-                <div class="form-group" style="margin-bottom:0;flex:1">
-                    <label style="font-size:.75rem">API Key n8n</label>
-                    <div style="display:flex;gap:6px">
-                        <input type="password" id="n8nKeyInput" placeholder="n8n_api_xxxxxxxxxxxx" style="flex:1;padding:8px 10px;font-size:.8rem">
-                        <button class="auto-btn" onclick="saveN8nKey()" style="white-space:nowrap">Salvar Key</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="auto-controls">
-                <button class="auto-btn toggle-btn" id="toggleAutoBtn" onclick="toggleAutomation()" disabled>
-                    <span id="toggleIcon">&#9654;</span> <span id="toggleText">Carregando...</span>
-                </button>
-                <button class="auto-btn" id="runNowBtn" onclick="runWorkflowNow()" style="background:#00d4aa">
-                    &#9889; Executar Agora
-                </button>
-            </div>
-
-            <div class="auto-actions" style="margin-top:10px">
-                <a class="auto-btn secondary" href="https://renanmenesesadv.app.n8n.cloud/workflow/b8gQZOtuCyIaLCnD" target="_blank" style="text-decoration:none;text-align:center">Abrir Workflow</a>
-                <a class="auto-btn secondary" href="https://renanmenesesadv.app.n8n.cloud/workflows" target="_blank" style="text-decoration:none;text-align:center">Painel n8n</a>
-                <a class="auto-btn secondary" href="https://renanmenesesadv.github.io/radar-rn-hub/" target="_blank" style="text-decoration:none;text-align:center">Radar Hub</a>
-            </div>
-
-            <div class="status-msg" id="autoMsg"></div>
-        </div>
-
-        </div> <!-- /secAutomacao -->
 
         <!-- Editor de Artigos -->
         <div class="admin-section" id="secEditor">
@@ -363,175 +295,10 @@
     // ===== Config =====
     const REPO_OWNER = 'renanmenesesadv';
     const REPO_NAME = 'Portal-Mundo-Flow';
-    const N8N_BASE = '/proxy/n8n';
-    const WORKFLOW_ID = 'b8gQZOtuCyIaLCnD';
     let githubToken = '';
-    let n8nApiKey = '';
     let tags = [];
     let imageBase64 = '';
     let imageName = '';
-
-    // ===== n8n Automation Control =====
-    function getN8nHeaders() {
-        return { 'X-N8N-API-KEY': n8nApiKey, 'Accept': 'application/json', 'Content-Type': 'application/json' };
-    }
-
-    async function n8nFetch(path, options) {
-        var opts = options || {};
-        opts.headers = getN8nHeaders();
-        var url = N8N_BASE + path;
-
-        var resp;
-        try {
-            resp = await fetch(url, opts);
-        } catch (e) {
-            throw new Error('Sem conexao com n8n. Verifique se o servidor esta online.');
-        }
-
-        if (resp.status === 401) {
-            throw new Error('API Key invalida. Gere uma nova em: n8n > Settings > API > Create API Key');
-        }
-        if (resp.status === 404) {
-            throw new Error('Workflow nao encontrado. Verifique o ID: ' + WORKFLOW_ID);
-        }
-
-        var text = await resp.text();
-        if (text.startsWith('<!')) {
-            throw new Error('Resposta HTML em vez de JSON. Proxy pode estar com problema.');
-        }
-
-        var data;
-        try { data = JSON.parse(text); } catch (e) {
-            throw new Error('Resposta invalida do n8n: ' + text.substring(0, 100));
-        }
-
-        if (!resp.ok) {
-            throw new Error(data.message || 'Erro HTTP ' + resp.status);
-        }
-
-        return data;
-    }
-
-    async function checkWorkflowStatus() {
-        if (!n8nApiKey) {
-            updateAutoUI(null);
-            return;
-        }
-        try {
-            var data = await n8nFetch('/api/v1/workflows/' + WORKFLOW_ID);
-            updateAutoUI(data.active);
-        } catch (e) {
-            updateAutoUI(null, e.message);
-        }
-    }
-
-    function updateAutoUI(active, error) {
-        var dot = document.getElementById('statusDot');
-        var label = document.getElementById('statusLabel');
-        var btn = document.getElementById('toggleAutoBtn');
-        var icon = document.getElementById('toggleIcon');
-        var text = document.getElementById('toggleText');
-
-        if (error || active === null) {
-            dot.className = 'status-dot off';
-            label.textContent = error ? error : 'Insira a API Key do n8n';
-            btn.disabled = !n8nApiKey;
-            icon.innerHTML = '&#9654;';
-            text.textContent = 'Ligar';
-            btn.classList.remove('active');
-            return;
-        }
-
-        dot.className = active ? 'status-dot on' : 'status-dot off';
-        label.textContent = active ? 'Automacao LIGADA' : 'Automacao DESLIGADA';
-        btn.disabled = false;
-        icon.innerHTML = active ? '&#9724;' : '&#9654;';
-        text.textContent = active ? 'Desligar' : 'Ligar';
-        btn.classList.toggle('active', active);
-    }
-
-    async function toggleAutomation() {
-        var btn = document.getElementById('toggleAutoBtn');
-        btn.disabled = true;
-
-        try {
-            var data = await n8nFetch('/api/v1/workflows/' + WORKFLOW_ID);
-            var newState = !data.active;
-            var activated = false;
-
-            // PUT /api/v1/workflows/{id} com body completo (n8n cloud)
-            data.active = newState;
-            await n8nFetch('/api/v1/workflows/' + WORKFLOW_ID, {
-                method: 'PUT',
-                body: JSON.stringify(data)
-            });
-
-            updateAutoUI(newState);
-            showAutoMsg(newState ? 'Automacao LIGADA com sucesso!' : 'Automacao DESLIGADA.', newState ? 'success' : 'error');
-        } catch (e) {
-            showAutoMsg(e.message, 'error');
-            btn.disabled = false;
-        }
-    }
-
-    async function runWorkflowNow() {
-        var btn = document.getElementById('runNowBtn');
-        var originalText = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '&#9889; Executando...';
-
-        try {
-            if (!n8nApiKey) throw new Error('Insira a API Key do n8n');
-
-            // POST /api/v1/executions (n8n cloud + self-hosted >= 1.x)
-            await n8nFetch('/api/v1/executions', {
-                method: 'POST',
-                body: JSON.stringify({ workflowId: WORKFLOW_ID })
-            });
-
-            showAutoMsg('Workflow executado! Novos artigos em 2-3 minutos.', 'success');
-        } catch (e) {
-            showAutoMsg(e.message, 'error');
-        }
-
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-    }
-
-    function saveN8nKey() {
-        const input = document.getElementById('n8nKeyInput');
-        const key = input.value.trim();
-        if (!key) return;
-        n8nApiKey = key;
-        localStorage.setItem('mf_n8n_key', key);
-        renderN8nKeyUI();
-        checkWorkflowStatus();
-        showAutoMsg('API Key salva com sucesso!', 'success');
-    }
-
-    function changeN8nKey() {
-        localStorage.removeItem('mf_n8n_key');
-        n8nApiKey = '';
-        renderN8nKeyUI();
-        updateAutoUI(null);
-    }
-
-    function renderN8nKeyUI() {
-        const row = document.getElementById('n8nKeyRow');
-        if (n8nApiKey) {
-            const masked = n8nApiKey.substring(0, 8) + '...' + n8nApiKey.slice(-4);
-            row.innerHTML = '<div class="auto-key-saved">&#9989; Key configurada: <code>' + masked + '</code> <button onclick="changeN8nKey()">alterar</button></div>';
-        } else {
-            row.innerHTML = '<div class="form-group" style="margin-bottom:0;flex:1"><label style="font-size:.75rem">API Key n8n</label><div style="display:flex;gap:6px"><input type="password" id="n8nKeyInput" placeholder="n8n_api_xxxxxxxxxxxx" style="flex:1;padding:8px 10px;font-size:.8rem"><button class="auto-btn" onclick="saveN8nKey()" style="white-space:nowrap">Salvar Key</button></div></div>';
-        }
-    }
-
-    function showAutoMsg(text, type) {
-        const el = document.getElementById('autoMsg');
-        el.textContent = text;
-        el.className = 'status-msg ' + type;
-        setTimeout(() => { el.className = 'status-msg'; }, 8000);
-    }
 
     // ===== Login =====
     function doLogin() {
@@ -539,13 +306,6 @@
         if (!token) return;
         githubToken = token;
         localStorage.setItem('mf_token', token);
-
-        const n8nKey = document.getElementById('n8nToken').value.trim();
-        if (n8nKey) {
-            n8nApiKey = n8nKey;
-            localStorage.setItem('mf_n8n_key', n8nKey);
-        }
-
         showAdmin();
     }
 
@@ -554,26 +314,17 @@
         document.getElementById('editorScreen').style.display = 'block';
         document.getElementById('adminNav').style.display = 'block';
         loadArticlesList();
-
-        // Restore n8n key and check status
-        if (!n8nApiKey) {
-            n8nApiKey = localStorage.getItem('mf_n8n_key') || '';
-        }
-        renderN8nKeyUI();
-        checkWorkflowStatus();
     }
 
     // Auto-login
     const saved = localStorage.getItem('mf_token');
     if (saved) {
         githubToken = saved;
-        n8nApiKey = localStorage.getItem('mf_n8n_key') || '';
         showAdmin();
     }
 
     function doLogout() {
         localStorage.removeItem('mf_token');
-        localStorage.removeItem('mf_n8n_key');
         location.reload();
     }
 
@@ -624,7 +375,7 @@
         const reader = new FileReader();
         reader.onload = function(e) {
             const base64Full = e.target.result;
-            imageBase64 = base64Full.split(',')[1]; // Remove data:image/...;base64,
+            imageBase64 = base64Full.split(',')[1];
             imageName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-').toLowerCase();
 
             document.getElementById('imagePreview').src = base64Full;
@@ -939,7 +690,7 @@
             showStatus('Artigo excluido', 'success');
         } catch(e) {
             showStatus('Erro ao excluir: ' + e.message, 'error');
-            loadArticlesList(); // Reload to restore
+            loadArticlesList();
         }
     }
     </script>
