@@ -8,18 +8,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_SSH_PORT }}
-          script: |
-            cd /opt/portal-mundo-flow
-            git pull origin main
-            docker compose down
-            docker compose up -d --build
-            echo "Deploy concluido em $(date)"
+      - name: Trigger deploy via webhook
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST \
+            -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" \
+            http://${{ secrets.SERVER_HOST }}:9191/)
+          echo "HTTP Status: $response"
+          if [ "$response" != "200" ]; then
+            echo "Deploy falhou com status $response"
+            exit 1
+          fi
+          echo "Deploy concluido com sucesso"
