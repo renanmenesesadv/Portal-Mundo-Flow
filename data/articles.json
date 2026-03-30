@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "title": "teste",
+    "slug": "teste-mnd6p5iv",
+    "excerpt": "",
+    "body": "\n                <h2>Subtitulo aqui</h2>\n                <p>Escreva o conteudo do artigo...</p>\n            <p class=\"article-attribution\"><em>Por Renan Meneses | Com informacoes de equipe editorial.</em></p>",
+    "category": "internacional",
+    "tags": [
+      "internacional"
+    ],
+    "source": "Mundo Flow Notícias",
+    "sourceUrl": "",
+    "author": "Renan Meneses",
+    "date": "2026-03-30T12:48:35.383Z",
+    "dateModified": "2026-03-30T12:48:35.383Z",
+    "readTime": "2 min",
+    "image": "",
+    "imageCredit": ""
+  }
+]
