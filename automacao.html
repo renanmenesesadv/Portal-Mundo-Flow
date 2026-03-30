@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Automação - Mundo Flow Notícias</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <style>
+        .auto-container{max-width:960px;margin:0 auto;padding:20px}
+        .auto-title{font-size:1.5rem;font-weight:700;margin-bottom:24px;color:var(--accent)}
+
+        /* Cards de status */
+        .status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+        .status-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center}
+        .status-card .card-value{font-size:2rem;font-weight:800;color:var(--accent)}
+        .status-card .card-label{font-size:.75rem;color:var(--text-muted);margin-top:4px}
+        .status-card.active .card-value{color:var(--success)}
+        .status-card.paused .card-value{color:var(--warning)}
+        .status-card.error .card-value{color:var(--accent)}
+
+        /* Seções */
+        .auto-section{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px}
+        .auto-section h2{font-size:1.1rem;font-weight:700;margin-bottom:16px;color:var(--text);display:flex;align-items:center;gap:8px}
+        .auto-section h2 .icon{font-size:1.3rem}
+
+        /* Botões */
+        .btn{padding:10px 24px;border:none;border-radius:var(--radius);font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+        .btn:hover{opacity:.9;transform:scale(1.01)}
+        .btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+        .btn-primary{background:var(--accent);color:#fff}
+        .btn-success{background:var(--success);color:#fff}
+        .btn-warning{background:var(--warning);color:#111}
+        .btn-secondary{background:var(--primary-light);color:var(--text);border:1px solid var(--border)}
+        .btn-sm{padding:6px 14px;font-size:.75rem}
+        .btn-group{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+        /* Workflow toggle */
+        .workflow-status{display:flex;align-items:center;justify-content:space-between;padding:16px;background:var(--primary-light);border-radius:var(--radius);margin-bottom:16px}
+        .workflow-status .ws-info{display:flex;align-items:center;gap:12px}
+        .ws-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+        .ws-dot.active{background:var(--success);box-shadow:0 0 8px rgba(0,212,170,.5)}
+        .ws-dot.inactive{background:var(--text-muted)}
+        .ws-name{font-weight:700;font-size:.95rem}
+        .ws-detail{font-size:.75rem;color:var(--text-muted)}
+
+        /* Tabela de execuções */
+        .exec-table{width:100%;border-collapse:collapse;font-size:.85rem}
+        .exec-table th{text-align:left;padding:10px 12px;border-bottom:2px solid var(--border);font-size:.75rem;color:var(--text-muted);text-transform:uppercase}
+        .exec-table td{padding:10px 12px;border-bottom:1px solid var(--border)}
+        .exec-table tr:hover{background:var(--primary-light)}
+        .badge{padding:3px 10px;border-radius:12px;font-size:.7rem;font-weight:700}
+        .badge-success{background:rgba(0,212,170,.15);color:var(--success)}
+        .badge-error{background:rgba(233,69,96,.15);color:var(--accent)}
+        .badge-running{background:rgba(255,167,38,.15);color:var(--warning)}
+        .badge-waiting{background:rgba(150,150,150,.15);color:var(--text-muted)}
+
+        /* Feed list */
+        .feed-list{display:grid;gap:8px}
+        .feed-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--primary-light);border-radius:var(--radius);font-size:.85rem}
+        .feed-item .feed-source{font-weight:700;min-width:100px}
+        .feed-item .feed-cat{font-size:.7rem;padding:2px 8px;border-radius:10px;background:var(--accent);color:#fff}
+        .feed-item .feed-url{font-size:.75rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+
+        /* Login */
+        .auto-login{max-width:400px;margin:100px auto;text-align:center}
+        .auto-login h2{margin-bottom:20px}
+        .form-group{margin-bottom:16px}
+        .form-group label{display:block;font-size:.85rem;font-weight:600;margin-bottom:6px;color:var(--text)}
+        .form-group input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);color:var(--text);font-size:.9rem}
+        .form-group input:focus{outline:none;border-color:var(--accent)}
+
+        /* Status msg */
+        .status-msg{padding:12px;border-radius:var(--radius);margin-top:12px;font-size:.9rem;display:none}
+        .status-msg.success{display:block;background:rgba(0,212,170,.15);color:#00d4aa;border:1px solid rgba(0,212,170,.3)}
+        .status-msg.error{display:block;background:rgba(233,69,96,.15);color:var(--accent);border:1px solid rgba(233,69,96,.3)}
+        .status-msg.loading{display:block;background:rgba(255,167,38,.15);color:var(--warning);border:1px solid rgba(255,167,38,.3)}
+
+        /* Log console */
+        .log-console{background:#1a1a2e;border-radius:var(--radius);padding:16px;max-height:300px;overflow-y:auto;font-family:monospace;font-size:.8rem;color:#a0ffa0;line-height:1.6}
+        .log-console .log-error{color:#ff6b6b}
+        .log-console .log-warn{color:#ffd93d}
+        .log-console .log-info{color:#6bcbff}
+
+        /* Nav */
+        .auto-nav{background:var(--primary-light);border-bottom:1px solid var(--border);position:sticky;top:52px;z-index:50}
+        .auto-nav ul{display:flex;list-style:none;max-width:960px;margin:0 auto;padding:0}
+        .auto-nav a{display:block;padding:12px 20px;font-size:.85rem;font-weight:600;color:var(--text-muted);border-bottom:2px solid transparent;transition:all .2s}
+        .auto-nav a:hover,.auto-nav a.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+        /* Responsive */
+        @media(max-width:768px){.status-grid{grid-template-columns:1fr 1fr}.exec-table{font-size:.75rem}.auto-nav a{padding:10px 12px;font-size:.8rem}}
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="header-top">
+                <a href="index.html" class="logo"><h1>Mundo Flow Notícias</h1><span class="tagline">Central de Automação</span></a>
+            </div>
+        </div>
+    </header>
+
+    <nav class="auto-nav" id="autoNav" style="display:none">
+        <ul>
+            <li><a href="#secDashboard" class="active">Dashboard</a></li>
+            <li><a href="#secExecucoes">Execuções</a></li>
+            <li><a href="#secFeeds">Feeds RSS</a></li>
+            <li><a href="#secLogs">Logs</a></li>
+            <li><a href="admin.html">Editor</a></li>
+            <li><a href="index.html" target="_blank" style="color:var(--success)">Ver Site</a></li>
+        </ul>
+    </nav>
+
+    <!-- Login -->
+    <div id="loginScreen" class="auto-container auto-login">
+        <h2>Central de Automação</h2>
+        <p style="color:var(--text-muted);font-size:.85rem;margin-bottom:20px">Gerencie o workflow de publicação automática</p>
+        <div class="form-group">
+            <label>API Key n8n</label>
+            <input type="password" id="n8nApiKey" placeholder="Sua API key do n8n cloud">
+        </div>
+        <div class="form-group">
+            <label>Token GitHub</label>
+            <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Entrar</button>
+        <p style="margin-top:12px;font-size:.7rem;color:var(--text-muted)">Credenciais ficam salvas no navegador (localStorage)</p>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="mainScreen" class="auto-container" style="display:none">
+
+        <!-- Dashboard -->
+        <div id="secDashboard">
+            <h1 class="auto-title">Dashboard de Automação</h1>
+
+            <!-- Status Cards -->
+            <div class="status-grid">
+                <div class="status-card" id="cardWorkflow">
+                    <div class="card-value" id="workflowStatusText">--</div>
+                    <div class="card-label">Status do Workflow</div>
+                </div>
+                <div class="status-card">
+                    <div class="card-value" id="totalArticles">--</div>
+                    <div class="card-label">Artigos Publicados</div>
+                </div>
+                <div class="status-card">
+                    <div class="card-value" id="todayArticles">--</div>
+                    <div class="card-label">Artigos Hoje</div>
+                </div>
+                <div class="status-card">
+                    <div class="card-value" id="lastRun">--</div>
+                    <div class="card-label">Última Execução</div>
+                </div>
+            </div>
+
+            <!-- Workflow Control -->
+            <div class="auto-section">
+                <h2><span class="icon">&#9881;</span> Controle do Workflow</h2>
+
+                <div class="workflow-status" id="workflowPanel">
+                    <div class="ws-info">
+                        <div class="ws-dot inactive" id="wsDot"></div>
+                        <div>
+                            <div class="ws-name" id="wsName">Mundo Flow - Auto Publisher v3</div>
+                            <div class="ws-detail" id="wsDetail">Carregando...</div>
+                        </div>
+                    </div>
+                    <div class="btn-group" style="margin-top:0">
+                        <button class="btn btn-success btn-sm" id="btnActivate" onclick="toggleWorkflow(true)" disabled>Ativar</button>
+                        <button class="btn btn-warning btn-sm" id="btnDeactivate" onclick="toggleWorkflow(false)" disabled>Pausar</button>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="btnTrigger" onclick="triggerWorkflow()">&#9654; Executar Agora</button>
+                    <button class="btn btn-secondary" onclick="refreshDashboard()">&#8635; Atualizar Dashboard</button>
+                    <button class="btn btn-secondary" onclick="triggerDeploy()">&#128640; Forçar Deploy</button>
+                </div>
+
+                <div class="status-msg" id="actionStatus"></div>
+            </div>
+        </div>
+
+        <!-- Execuções -->
+        <div id="secExecucoes">
+            <div class="auto-section">
+                <h2><span class="icon">&#128196;</span> Histórico de Execuções</h2>
+                <button class="btn btn-secondary btn-sm" onclick="loadExecutions()" style="margin-bottom:12px">Atualizar</button>
+                <div style="overflow-x:auto">
+                    <table class="exec-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Status</th>
+                                <th>Início</th>
+                                <th>Duração</th>
+                                <th>Modo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="execTableBody">
+                            <tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Carregando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feeds RSS -->
+        <div id="secFeeds">
+            <div class="auto-section">
+                <h2><span class="icon">&#128225;</span> Feeds RSS Configurados</h2>
+                <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:12px">Fontes de notícias que alimentam o workflow automático</p>
+                <div class="feed-list" id="feedList"></div>
+            </div>
+        </div>
+
+        <!-- Logs -->
+        <div id="secLogs">
+            <div class="auto-section">
+                <h2><span class="icon">&#128187;</span> Log de Atividades</h2>
+                <div class="btn-group" style="margin-bottom:12px;margin-top:0">
+                    <button class="btn btn-secondary btn-sm" onclick="clearLogs()">Limpar</button>
+                </div>
+                <div class="log-console" id="logConsole">
+                    <div class="log-info">[Sistema] Central de automação iniciada</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+    // ===== Config =====
+    const N8N_BASE = '/proxy/n8n';
+    const GITHUB_OWNER = 'renanmenesesadv';
+    const GITHUB_REPO = 'Portal-Mundo-Flow';
+    const FEEDS = [
+        { source: 'Metrópoles', category: 'geral', url: 'metropoles.com/feed' },
+        { source: 'Poder360', category: 'política', url: 'poder360.com.br/feed' },
+        { source: 'BBC Brasil', category: 'internacional', url: 'bbci.co.uk/portuguese/rss.xml' },
+        { source: 'NY Times', category: 'internacional', url: 'nytimes.com/.../World.xml' },
+        { source: 'InfoMoney', category: 'economia', url: 'infomoney.com.br/feed' },
+        { source: 'JOTA', category: 'política', url: 'jota.info/feed' },
+        { source: 'BBC World', category: 'internacional', url: 'bbci.co.uk/news/world/rss.xml' },
+        { source: 'CNN Brasil', category: 'geral', url: 'cnnbrasil.com.br/feed' },
+        { source: 'Exame', category: 'negócios', url: 'exame.com/feed' }
+    ];
+
+    let n8nKey = '';
+    let githubToken = '';
+    let workflowId = '';
+
+    // ===== Login =====
+    function doLogin() {
+        const key = document.getElementById('n8nApiKey').value.trim();
+        const token = document.getElementById('githubToken').value.trim();
+        if (!key || !token) { alert('Preencha ambos os campos'); return; }
+        n8nKey = key;
+        githubToken = token;
+        localStorage.setItem('mf_n8n_key', key);
+        localStorage.setItem('mf_token', token);
+        showDashboard();
+    }
+
+    function showDashboard() {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('mainScreen').style.display = 'block';
+        document.getElementById('autoNav').style.display = 'block';
+        renderFeeds();
+        refreshDashboard();
+    }
+
+    // Auto-login
+    (function() {
+        const k = localStorage.getItem('mf_n8n_key');
+        const t = localStorage.getItem('mf_token');
+        if (k && t) { n8nKey = k; githubToken = t; showDashboard(); }
+    })();
+
+    // ===== n8n API =====
+    async function n8nFetch(path, opts = {}) {
+        const resp = await fetch(N8N_BASE + path, {
+            ...opts,
+            headers: {
+                'X-N8N-API-KEY': n8nKey,
+                'Content-Type': 'application/json',
+                ...(opts.headers || {})
+            }
+        });
+        if (!resp.ok) throw new Error(`n8n API ${resp.status}: ${resp.statusText}`);
+        return resp.json();
+    }
+
+    // ===== Dashboard =====
+    async function refreshDashboard() {
+        addLog('info', 'Atualizando dashboard...');
+
+        // Load workflow
+        try {
+            const workflows = await n8nFetch('/api/v1/workflows?limit=50');
+            const wf = (workflows.data || []).find(w =>
+                w.name.toLowerCase().includes('mundo') ||
+                w.name.toLowerCase().includes('flow') ||
+                w.name.toLowerCase().includes('publisher')
+            );
+
+            if (wf) {
+                workflowId = wf.id;
+                const isActive = wf.active;
+                document.getElementById('wsName').textContent = wf.name;
+                document.getElementById('wsDetail').textContent = `ID: ${wf.id} | ${isActive ? 'Ativo - rodando a cada 2h' : 'Pausado'}`;
+                document.getElementById('wsDot').className = 'ws-dot ' + (isActive ? 'active' : 'inactive');
+                document.getElementById('workflowStatusText').textContent = isActive ? 'Ativo' : 'Pausado';
+                document.getElementById('cardWorkflow').className = 'status-card ' + (isActive ? 'active' : 'paused');
+                document.getElementById('btnActivate').disabled = isActive;
+                document.getElementById('btnDeactivate').disabled = !isActive;
+                document.getElementById('btnTrigger').disabled = false;
+                addLog('info', `Workflow "${wf.name}" encontrado (${isActive ? 'ativo' : 'pausado'})`);
+            } else {
+                document.getElementById('wsDetail').textContent = 'Workflow não encontrado no n8n';
+                document.getElementById('workflowStatusText').textContent = 'N/A';
+                addLog('error', 'Workflow do portal não encontrado no n8n');
+            }
+        } catch (e) {
+            document.getElementById('wsDetail').textContent = 'Erro ao conectar: ' + e.message;
+            document.getElementById('workflowStatusText').textContent = 'Erro';
+            document.getElementById('cardWorkflow').className = 'status-card error';
+            addLog('error', 'Falha ao conectar n8n: ' + e.message);
+        }
+
+        // Load articles stats
+        try {
+            const resp = await fetch('https://raw.githubusercontent.com/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/main/data/articles.json?t=' + Date.now(), { cache: 'no-store' });
+            const articles = await resp.json();
+            const today = new Date().toISOString().substring(0, 10);
+            const todayCount = articles.filter(a => (a.date || '').substring(0, 10) === today).length;
+
+            document.getElementById('totalArticles').textContent = articles.length;
+            document.getElementById('todayArticles').textContent = todayCount;
+            addLog('info', `${articles.length} artigos no total, ${todayCount} de hoje`);
+        } catch (e) {
+            addLog('warn', 'Não foi possível carregar estatísticas de artigos');
+        }
+
+        // Load executions
+        loadExecutions();
+    }
+
+    // ===== Workflow Controls =====
+    async function toggleWorkflow(activate) {
+        if (!workflowId) { showAction('Workflow não encontrado', 'error'); return; }
+        showAction(activate ? 'Ativando...' : 'Pausando...', 'loading');
+
+        try {
+            if (activate) {
+                await n8nFetch('/api/v1/workflows/' + workflowId + '/activate', { method: 'POST' });
+            } else {
+                await n8nFetch('/api/v1/workflows/' + workflowId + '/deactivate', { method: 'POST' });
+            }
+            showAction(activate ? 'Workflow ativado!' : 'Workflow pausado!', 'success');
+            addLog('info', activate ? 'Workflow ATIVADO' : 'Workflow PAUSADO');
+            setTimeout(refreshDashboard, 1000);
+        } catch (e) {
+            showAction('Erro: ' + e.message, 'error');
+            addLog('error', 'Falha ao alterar workflow: ' + e.message);
+        }
+    }
+
+    async function triggerWorkflow() {
+        if (!workflowId) { showAction('Workflow não encontrado', 'error'); return; }
+        showAction('Executando workflow...', 'loading');
+        document.getElementById('btnTrigger').disabled = true;
+
+        try {
+            const result = await n8nFetch('/api/v1/workflows/' + workflowId + '/run', { method: 'POST', body: '{}' });
+            showAction('Workflow disparado! Execução em andamento...', 'success');
+            addLog('info', 'Workflow disparado manualmente (ID execução: ' + (result.data?.id || 'N/A') + ')');
+            setTimeout(() => {
+                document.getElementById('btnTrigger').disabled = false;
+                loadExecutions();
+            }, 5000);
+        } catch (e) {
+            // Fallback: tentar via webhook test
+            try {
+                await n8nFetch('/api/v1/executions', {
+                    method: 'POST',
+                    body: JSON.stringify({ workflowId: workflowId })
+                });
+                showAction('Workflow disparado via execução!', 'success');
+                addLog('info', 'Workflow disparado (fallback)');
+            } catch (e2) {
+                showAction('Erro ao disparar: ' + e.message, 'error');
+                addLog('error', 'Falha ao disparar workflow: ' + e.message);
+            }
+            document.getElementById('btnTrigger').disabled = false;
+        }
+    }
+
+    async function triggerDeploy() {
+        showAction('Disparando deploy no VPS...', 'loading');
+        addLog('info', 'Disparando deploy manual no VPS...');
+
+        try {
+            const resp = await fetch('/deploy-trigger', { method: 'POST' });
+            if (resp.ok) {
+                showAction('Deploy disparado com sucesso!', 'success');
+                addLog('info', 'Deploy concluído no VPS');
+            } else {
+                throw new Error('Status ' + resp.status);
+            }
+        } catch (e) {
+            showAction('Deploy via GitHub Actions... (push necessário)', 'loading');
+            addLog('warn', 'Deploy direto não disponível. Use git push para disparar via GitHub Actions.');
+            setTimeout(() => showAction('Para deploy, faça um push no GitHub ou use o admin', 'error'), 2000);
+        }
+    }
+
+    // ===== Executions =====
+    async function loadExecutions() {
+        const tbody = document.getElementById('execTableBody');
+
+        try {
+            let url = '/api/v1/executions?limit=15';
+            if (workflowId) url += '&workflowId=' + workflowId;
+
+            const result = await n8nFetch(url);
+            const execs = result.data || [];
+
+            if (!execs.length) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Nenhuma execução encontrada</td></tr>';
+                return;
+            }
+
+            // Last run
+            if (execs[0]) {
+                const lastDate = new Date(execs[0].startedAt || execs[0].createdAt);
+                document.getElementById('lastRun').textContent = lastDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            }
+
+            tbody.innerHTML = execs.map(ex => {
+                const status = ex.status || (ex.finished ? 'success' : 'running');
+                const badgeClass = status === 'success' ? 'badge-success' :
+                                   status === 'error' ? 'badge-error' :
+                                   status === 'running' ? 'badge-running' : 'badge-waiting';
+                const statusText = status === 'success' ? 'Sucesso' :
+                                   status === 'error' ? 'Erro' :
+                                   status === 'running' ? 'Rodando' : status;
+
+                const started = ex.startedAt ? new Date(ex.startedAt).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '--';
+
+                let duration = '--';
+                if (ex.startedAt && ex.stoppedAt) {
+                    const ms = new Date(ex.stoppedAt) - new Date(ex.startedAt);
+                    duration = ms < 1000 ? ms + 'ms' : Math.round(ms / 1000) + 's';
+                }
+
+                const mode = ex.mode === 'manual' ? 'Manual' : ex.mode === 'trigger' ? 'Trigger' : ex.mode || '--';
+
+                return `<tr>
+                    <td style="font-family:monospace;font-size:.75rem">${(ex.id || '').toString().substring(0, 8)}</td>
+                    <td><span class="badge ${badgeClass}">${statusText}</span></td>
+                    <td>${started}</td>
+                    <td>${duration}</td>
+                    <td>${mode}</td>
+                </tr>`;
+            }).join('');
+
+            addLog('info', `${execs.length} execuções carregadas`);
+        } catch (e) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--accent)">Erro ao carregar: ' + e.message + '</td></tr>';
+            addLog('error', 'Falha ao carregar execuções: ' + e.message);
+        }
+    }
+
+    // ===== Feeds =====
+    function renderFeeds() {
+        const list = document.getElementById('feedList');
+        list.innerHTML = FEEDS.map(f =>
+            `<div class="feed-item">
+                <span class="feed-source">${f.source}</span>
+                <span class="feed-cat">${f.category}</span>
+                <span class="feed-url">${f.url}</span>
+            </div>`
+        ).join('');
+    }
+
+    // ===== Logs =====
+    function addLog(type, msg) {
+        const console = document.getElementById('logConsole');
+        const time = new Date().toLocaleTimeString('pt-BR');
+        const cls = type === 'error' ? 'log-error' : type === 'warn' ? 'log-warn' : 'log-info';
+        const prefix = type === 'error' ? 'ERRO' : type === 'warn' ? 'AVISO' : 'INFO';
+        console.innerHTML += `<div class="${cls}">[${time}] [${prefix}] ${msg}</div>`;
+        console.scrollTop = console.scrollHeight;
+    }
+
+    function clearLogs() {
+        document.getElementById('logConsole').innerHTML = '<div class="log-info">[' + new Date().toLocaleTimeString('pt-BR') + '] [INFO] Logs limpos</div>';
+    }
+
+    // ===== UI Helpers =====
+    function showAction(msg, type) {
+        const el = document.getElementById('actionStatus');
+        el.textContent = msg;
+        el.className = 'status-msg ' + type;
+    }
+
+    // Nav smooth scroll
+    document.addEventListener('click', function(e) {
+        if (e.target.tagName === 'A' && e.target.hash && e.target.hash.startsWith('#sec')) {
+            e.preventDefault();
+            document.querySelectorAll('.auto-nav a').forEach(a => a.classList.remove('active'));
+            e.target.classList.add('active');
+            const target = document.querySelector(e.target.hash);
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+    </script>
+</body>
+</html>
