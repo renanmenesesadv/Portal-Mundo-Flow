@@ -1,4 +1,4 @@
-/* ===== Mundo em Foco - Main JS ===== */
+/* ===== Mundo Flow Notícias - Main JS ===== */
 (function () {
   'use strict';
 
@@ -72,7 +72,7 @@
   // ===== Data Loading =====
   async function loadArticles() {
     try {
-      const resp = await fetch(CONFIG.dataUrl);
+      const resp = await fetch(CONFIG.dataUrl + '?t=' + Date.now(), { cache: 'no-store' });
       if (!resp.ok) throw new Error('Failed to load articles');
       allArticles = await resp.json();
       // Sort by date descending

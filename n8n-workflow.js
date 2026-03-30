@@ -1,6 +1,6 @@
 /**
  * ============================================================
- * WORKFLOW N8N - Mundo em Foco - Auto Publisher v2
+ * WORKFLOW N8N - Mundo Flow Notícias - Auto Publisher v2
  * ============================================================
  * Motor: Claude Sonnet 4.5 (Anthropic)
  * Imagens: Extraidas das fontes originais com creditos
@@ -208,9 +208,9 @@ const generateArticle = node({
     parameters: {
       promptType: 'define',
       text: expr(
-        'Voce e o redator-chefe do portal "Mundo em Foco", um site de noticias brasileiro com linguagem propria: ' +
+        'Voce e o redator-chefe do portal "Mundo Flow Notícias", um site de noticias brasileiro com linguagem propria: ' +
         'acessivel, direta, levemente opinativa quando pertinente, e sempre contextualizando os fatos para o leitor brasileiro. ' +
-        'Voce NAO replica noticias - voce REESCREVE com analise, contexto e a voz editorial unica do Mundo em Foco.\n\n' +
+        'Voce NAO replica noticias - voce REESCREVE com analise, contexto e a voz editorial unica do Mundo Flow Notícias.\n\n' +
         'NOTICIA DE REFERENCIA (fonte: {{ $json.source }}):\n' +
         'Titulo original: {{ $json.title }}\n' +
         'Resumo: {{ $json.description }}\n' +
@@ -289,7 +289,7 @@ for (const item of items) {
     }
 
     // Atribuicao de fonte no final
-    body += '<p class="article-attribution"><em>Com informacoes de ' + (article.source || 'agencias') + '. Reportagem reescrita e contextualizada pela equipe Mundo em Foco.</em></p>';
+    body += '<p class="article-attribution"><em>Com informacoes de ' + (article.source || 'agencias') + '. Reportagem reescrita e contextualizada pela equipe Mundo Flow Notícias.</em></p>';
 
     results.push({
       json: {
@@ -396,7 +396,7 @@ const updateGitHub = node({
       repository: { __rl: true, mode: 'name', value: placeholder('Portal-Mundo-Flow') },
       filePath: 'data/articles.json',
       fileContent: expr('{{ $json.articlesJson }}'),
-      commitMessage: expr('Publicar {{ $json.newCount }} artigos - Mundo em Foco (total: {{ $json.articleCount }})')
+      commitMessage: expr('Publicar {{ $json.newCount }} artigos - Mundo Flow Notícias (total: {{ $json.articleCount }})')
     },
     credentials: { githubApi: newCredential('GitHub Personal Token') },
     position: [1920, 300]
@@ -418,7 +418,7 @@ const noteFlow = sticky(
   '## Como Funciona\\n\\n' +
   '1. Busca 9 feeds RSS (Metropoles, Poder360, BBC, NYT, CNN, InfoMoney...)\\n' +
   '2. Extrai imagens originais (RSS + og:image da fonte)\\n' +
-  '3. Claude reescreve com voz propria do Mundo em Foco\\n' +
+  '3. Claude reescreve com voz propria do Mundo Flow Notícias\\n' +
   '4. Adiciona credito de imagem + atribuicao de fonte\\n' +
   '5. Merge com artigos existentes + commit no GitHub\\n' +
   '6. GitHub Pages publica automaticamente',
@@ -426,7 +426,7 @@ const noteFlow = sticky(
 );
 
 // ===== WORKFLOW =====
-export default workflow('mundo-em-foco-publisher', 'Mundo em Foco - Auto Publisher')
+export default workflow('mundo-em-foco-publisher', 'Mundo Flow Notícias - Auto Publisher')
   .add(scheduleTrigger)
   .to(extractNews)
   .to(fetchSourceImage)

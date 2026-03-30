@@ -1,4 +1,4 @@
-/* ===== Mundo em Foco - Article Page JS ===== */
+/* ===== Mundo Flow Notícias - Article Page JS ===== */
 (function () {
   'use strict';
 
@@ -57,7 +57,7 @@
 
   async function loadArticles() {
     try {
-      const resp = await fetch(DATA_URL);
+      const resp = await fetch(DATA_URL + '?t=' + Date.now(), { cache: 'no-store' });
       if (!resp.ok) throw new Error('Failed');
       const data = await resp.json();
       data.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -87,7 +87,7 @@
     if (authorEl) authorEl.textContent = article.author || 'Renan Meneses';
 
     const sourceEl = document.getElementById('articleSource');
-    if (sourceEl) sourceEl.textContent = article.source || 'Mundo em Foco';
+    if (sourceEl) sourceEl.textContent = article.source || 'Mundo Flow Notícias';
 
     const readTimeEl = document.getElementById('articleReadTime');
     if (readTimeEl) readTimeEl.textContent = article.readTime || calcReadTime(article.body) + ' min de leitura';
@@ -126,7 +126,7 @@
     const desc = article.excerpt || truncate(stripHtml(article.body || ''), 160);
     const catName = CATEGORIES[article.category] || article.category;
 
-    document.title = `${article.title} - Mundo em Foco`;
+    document.title = `${article.title} - Mundo Flow Notícias`;
     setMeta('metaDescription', desc);
     setMeta('metaKeywords', (article.tags || []).join(', ') + ', not\u00edcias, ' + catName);
     setAttr('canonicalLink', 'href', url);
@@ -146,7 +146,7 @@
 
     // Page title
     const ptEl = document.getElementById('pageTitle');
-    if (ptEl) ptEl.textContent = `${article.title} - Mundo em Foco`;
+    if (ptEl) ptEl.textContent = `${article.title} - Mundo Flow Notícias`;
 
     // Article Schema
     const schemaEl = document.getElementById('articleSchema');
@@ -165,7 +165,7 @@
         },
         publisher: {
           '@type': 'Organization',
-          name: 'Mundo em Foco',
+          name: 'Mundo Flow Notícias',
           logo: { '@type': 'ImageObject', url: BASE_URL + 'img/logo.png' }
         },
         mainEntityOfPage: { '@type': 'WebPage', '@id': url },

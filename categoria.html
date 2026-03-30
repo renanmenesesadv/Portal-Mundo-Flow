@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="index, follow">
         <meta name="google-adsense-account" content="ca-pub-9450350856883249">
-    <meta name="description" id="metaDesc" content="Notícias por categoria - Mundo em Foco">
+    <meta name="description" id="metaDesc" content="Notícias por categoria - Mundo Flow Notícias">
     <link rel="canonical" id="canonicalCat" href="https://mundoflownoticias.com.br/categoria.html">
-    <title id="pageTitle">Categoria - Mundo em Foco</title>
+    <title id="pageTitle">Categoria - Mundo Flow Notícias</title>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9450350856883249" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" type="image/png" href="img/favicon.png">
@@ -17,7 +17,7 @@
     <header class="site-header">
         <div class="container">
             <div class="header-top">
-                <a href="index.html" class="logo"><h1>Mundo em Foco</h1><span class="tagline">Notícias Nacionais e Internacionais</span></a>
+                <a href="index.html" class="logo"><h1>Mundo Flow Notícias</h1><span class="tagline">Notícias Nacionais e Internacionais</span></a>
                 <div class="header-actions">
                     <div class="search-box">
                         <input type="text" id="searchInput" placeholder="Buscar notícias..." aria-label="Buscar">
@@ -58,7 +58,7 @@
     <footer class="site-footer">
         <div class="container">
             <div class="footer-grid">
-                <div class="footer-col"><h3>Mundo em Foco</h3><p>Portal de notícias em tempo real.</p></div>
+                <div class="footer-col"><h3>Mundo Flow Notícias</h3><p>Portal de notícias em tempo real.</p></div>
                 <div class="footer-col"><h3>Categorias</h3><ul>
                     <li><a href="categoria.html?cat=politica">Política</a></li>
                     <li><a href="categoria.html?cat=economia">Economia</a></li>
@@ -72,7 +72,7 @@
                     <li><a href="contato.html">Contato</a></li>
                 </ul></div>
             </div>
-            <div class="footer-bottom"><p>&copy; <span id="currentYear"></span> Mundo em Foco.</p></div>
+            <div class="footer-bottom"><p>&copy; <span id="currentYear"></span> Mundo Flow Notícias.</p></div>
         </div>
     </footer>
 
@@ -93,11 +93,11 @@
         const name=CATS[cat]||cat;
         document.getElementById('categoryTitle').textContent=name;
         document.getElementById('categoryDesc').textContent=DESCS[cat]||'';
-        document.getElementById('pageTitle').textContent=name+' - Mundo em Foco';
-        document.getElementById('metaDesc').setAttribute('content','Notícias de '+name+' - Mundo em Foco');
+        document.getElementById('pageTitle').textContent=name+' - Mundo Flow Notícias';
+        document.getElementById('metaDesc').setAttribute('content','Notícias de '+name+' - Mundo Flow Notícias');
         const navEl=document.getElementById('nav-'+cat);if(navEl)navEl.classList.add('active');
 
-        try{const r=await fetch('data/articles.json');all=await r.json();all.sort((a,b)=>new Date(b.date)-new Date(a.date));all=all.filter(a=>a.category===cat)}catch(e){all=[]}
+        try{const r=await fetch('data/articles.json?t='+Date.now(),{cache:'no-store'});all=await r.json();all.sort((a,b)=>new Date(b.date)-new Date(a.date));all=all.filter(a=>a.category===cat)}catch(e){all=[]}
         render();
         document.getElementById('loadMoreBtn').addEventListener('click',render);
       });
