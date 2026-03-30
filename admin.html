@@ -376,15 +376,49 @@
         return { 'X-N8N-API-KEY': n8nApiKey, 'Accept': 'application/json', 'Content-Type': 'application/json' };
     }
 
+    async function n8nFetch(path, options) {
+        var opts = options || {};
+        opts.headers = getN8nHeaders();
+        var url = N8N_BASE + path;
+
+        var resp;
+        try {
+            resp = await fetch(url, opts);
+        } catch (e) {
+            throw new Error('Sem conexao com n8n. Verifique se o servidor esta online.');
+        }
+
+        if (resp.status === 401) {
+            throw new Error('API Key invalida. Gere uma nova em: n8n > Settings > API > Create API Key');
+        }
+        if (resp.status === 404) {
+            throw new Error('Workflow nao encontrado. Verifique o ID: ' + WORKFLOW_ID);
+        }
+
+        var text = await resp.text();
+        if (text.startsWith('<!')) {
+            throw new Error('Resposta HTML em vez de JSON. Proxy pode estar com problema.');
+        }
+
+        var data;
+        try { data = JSON.parse(text); } catch (e) {
+            throw new Error('Resposta invalida do n8n: ' + text.substring(0, 100));
+        }
+
+        if (!resp.ok) {
+            throw new Error(data.message || 'Erro HTTP ' + resp.status);
+        }
+
+        return data;
+    }
+
     async function checkWorkflowStatus() {
         if (!n8nApiKey) {
             updateAutoUI(null);
             return;
         }
         try {
-            const resp = await fetch(N8N_BASE + '/api/v1/workflows/' + WORKFLOW_ID, { headers: getN8nHeaders() });
-            if (!resp.ok) throw new Error('Falha na API');
-            const data = await resp.json();
+            var data = await n8nFetch('/api/v1/workflows/' + WORKFLOW_ID);
             updateAutoUI(data.active);
         } catch (e) {
             updateAutoUI(null, e.message);
@@ -392,15 +426,15 @@
     }
 
     function updateAutoUI(active, error) {
-        const dot = document.getElementById('statusDot');
-        const label = document.getElementById('statusLabel');
-        const btn = document.getElementById('toggleAutoBtn');
-        const icon = document.getElementById('toggleIcon');
-        const text = document.getElementById('toggleText');
+        var dot = document.getElementById('statusDot');
+        var label = document.getElementById('statusLabel');
+        var btn = document.getElementById('toggleAutoBtn');
+        var icon = document.getElementById('toggleIcon');
+        var text = document.getElementById('toggleText');
 
         if (error || active === null) {
             dot.className = 'status-dot off';
-            label.textContent = error ? 'Erro: ' + error : 'Insira a API Key do n8n';
+            label.textContent = error ? error : 'Insira a API Key do n8n';
             btn.disabled = !n8nApiKey;
             icon.innerHTML = '&#9654;';
             text.textContent = 'Ligar';
@@ -417,60 +451,52 @@
     }
 
     async function toggleAutomation() {
-        const btn = document.getElementById('toggleAutoBtn');
-        const msg = document.getElementById('autoMsg');
+        var btn = document.getElementById('toggleAutoBtn');
         btn.disabled = true;
 
         try {
-            // Check current state
-            const resp = await fetch(N8N_BASE + '/api/v1/workflows/' + WORKFLOW_ID, { headers: getN8nHeaders() });
-            if (!resp.ok) throw new Error('Falha ao consultar workflow (HTTP ' + resp.status + ')');
-            const data = await resp.json();
-            const newState = !data.active;
+            var data = await n8nFetch('/api/v1/workflows/' + WORKFLOW_ID);
+            var newState = !data.active;
 
-            // Activate or deactivate via PATCH
-            const toggleResp = await fetch(N8N_BASE + '/api/v1/workflows/' + WORKFLOW_ID, {
+            await n8nFetch('/api/v1/workflows/' + WORKFLOW_ID, {
                 method: 'PATCH',
-                headers: getN8nHeaders(),
                 body: JSON.stringify({ active: newState })
             });
-            if (!toggleResp.ok) {
-                const err = await toggleResp.json().catch(() => ({}));
-                throw new Error(err.message || 'Falha ao alterar estado (HTTP ' + toggleResp.status + ')');
-            }
 
             updateAutoUI(newState);
             showAutoMsg(newState ? 'Automacao LIGADA com sucesso!' : 'Automacao DESLIGADA.', newState ? 'success' : 'error');
         } catch (e) {
-            showAutoMsg('Erro: ' + e.message, 'error');
+            showAutoMsg(e.message, 'error');
             btn.disabled = false;
         }
     }
 
     async function runWorkflowNow() {
-        const btn = document.getElementById('runNowBtn');
-        const msg = document.getElementById('autoMsg');
-        const originalText = btn.innerHTML;
+        var btn = document.getElementById('runNowBtn');
+        var originalText = btn.innerHTML;
         btn.disabled = true;
         btn.innerHTML = '&#9889; Executando...';
 
         try {
             if (!n8nApiKey) throw new Error('Insira a API Key do n8n');
 
-            const resp = await fetch(N8N_BASE + '/api/v1/executions', {
-                method: 'POST',
-                headers: getN8nHeaders(),
-                body: JSON.stringify({ workflowId: WORKFLOW_ID })
-            });
-
-            if (!resp.ok) {
-                const err = await resp.json().catch(() => ({}));
-                throw new Error(err.message || 'Falha ao executar (HTTP ' + resp.status + ')');
+            // Tenta POST /executions (n8n >= 1.x)
+            try {
+                await n8nFetch('/api/v1/executions', {
+                    method: 'POST',
+                    body: JSON.stringify({ workflowId: WORKFLOW_ID })
+                });
+            } catch (e1) {
+                // Fallback: POST /workflows/{id}/run (algumas versoes)
+                await n8nFetch('/api/v1/workflows/' + WORKFLOW_ID + '/run', {
+                    method: 'POST',
+                    body: JSON.stringify({})
+                });
             }
 
-            showAutoMsg('Workflow executado! Novos artigos devem aparecer em 2-3 minutos.', 'success');
+            showAutoMsg('Workflow executado! Novos artigos em 2-3 minutos.', 'success');
         } catch (e) {
-            showAutoMsg('Erro: ' + e.message, 'error');
+            showAutoMsg(e.message, 'error');
         }
 
         btn.disabled = false;
