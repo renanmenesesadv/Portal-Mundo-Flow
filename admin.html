@@ -459,10 +459,11 @@
             var newState = !data.active;
             var activated = false;
 
-            // PATCH /api/v1/workflows/{id} (n8n cloud + self-hosted >= 1.x)
+            // PUT /api/v1/workflows/{id} com body completo (n8n cloud)
+            data.active = newState;
             await n8nFetch('/api/v1/workflows/' + WORKFLOW_ID, {
-                method: 'PATCH',
-                body: JSON.stringify({ active: newState })
+                method: 'PUT',
+                body: JSON.stringify(data)
             });
 
             updateAutoUI(newState);
