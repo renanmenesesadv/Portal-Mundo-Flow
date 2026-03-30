@@ -424,16 +424,20 @@
         try {
             // Check current state
             const resp = await fetch(N8N_BASE + '/api/v1/workflows/' + WORKFLOW_ID, { headers: getN8nHeaders() });
+            if (!resp.ok) throw new Error('Falha ao consultar workflow (HTTP ' + resp.status + ')');
             const data = await resp.json();
             const newState = !data.active;
 
-            // Activate or deactivate
-            const endpoint = newState
-                ? N8N_BASE + '/api/v1/workflows/' + WORKFLOW_ID + '/activate'
-                : N8N_BASE + '/api/v1/workflows/' + WORKFLOW_ID + '/deactivate';
-
-            const toggleResp = await fetch(endpoint, { method: 'POST', headers: getN8nHeaders() });
-            if (!toggleResp.ok) throw new Error('Falha ao alterar estado');
+            // Activate or deactivate via PATCH
+            const toggleResp = await fetch(N8N_BASE + '/api/v1/workflows/' + WORKFLOW_ID, {
+                method: 'PATCH',
+                headers: getN8nHeaders(),
+                body: JSON.stringify({ active: newState })
+            });
+            if (!toggleResp.ok) {
+                const err = await toggleResp.json().catch(() => ({}));
+                throw new Error(err.message || 'Falha ao alterar estado (HTTP ' + toggleResp.status + ')');
+            }
 
             updateAutoUI(newState);
             showAutoMsg(newState ? 'Automacao LIGADA com sucesso!' : 'Automacao DESLIGADA.', newState ? 'success' : 'error');
@@ -453,10 +457,10 @@
         try {
             if (!n8nApiKey) throw new Error('Insira a API Key do n8n');
 
-            const resp = await fetch(N8N_BASE + '/api/v1/workflows/' + WORKFLOW_ID + '/run', {
+            const resp = await fetch(N8N_BASE + '/api/v1/executions', {
                 method: 'POST',
                 headers: getN8nHeaders(),
-                body: JSON.stringify({})
+                body: JSON.stringify({ workflowId: WORKFLOW_ID })
             });
 
             if (!resp.ok) {
