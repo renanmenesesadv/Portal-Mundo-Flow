@@ -60,6 +60,10 @@
         .auto-btn:hover{opacity:.85}
         .auto-btn.secondary{background:var(--primary-light);color:var(--text);border:1px solid var(--border)}
         .auto-btn:disabled{opacity:.5;cursor:not-allowed}
+        .auto-key-row{margin-top:12px;padding:10px;background:var(--primary-light);border:1px solid var(--border);border-radius:var(--radius)}
+        .auto-key-row.hidden{display:none}
+        .auto-key-saved{font-size:.75rem;color:#00d4aa;margin-top:8px;display:flex;align-items:center;gap:6px}
+        .auto-key-saved button{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.7rem;text-decoration:underline}
         .auto-controls{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
         .toggle-btn{min-width:180px;display:flex;align-items:center;justify-content:center;gap:6px}
         .toggle-btn.active{background:#00d4aa}
@@ -147,6 +151,16 @@
                 <div class="auto-status" id="autoStatus">
                     <span class="status-dot" id="statusDot"></span>
                     <span class="status-label" id="statusLabel">Verificando...</span>
+                </div>
+            </div>
+
+            <div class="auto-key-row" id="n8nKeyRow">
+                <div class="form-group" style="margin-bottom:0;flex:1">
+                    <label style="font-size:.75rem">API Key n8n</label>
+                    <div style="display:flex;gap:6px">
+                        <input type="password" id="n8nKeyInput" placeholder="n8n_api_xxxxxxxxxxxx" style="flex:1;padding:8px 10px;font-size:.8rem">
+                        <button class="auto-btn" onclick="saveN8nKey()" style="white-space:nowrap">Salvar Key</button>
+                    </div>
                 </div>
             </div>
 
@@ -459,6 +473,34 @@
         btn.innerHTML = originalText;
     }
 
+    function saveN8nKey() {
+        const input = document.getElementById('n8nKeyInput');
+        const key = input.value.trim();
+        if (!key) return;
+        n8nApiKey = key;
+        localStorage.setItem('mf_n8n_key', key);
+        renderN8nKeyUI();
+        checkWorkflowStatus();
+        showAutoMsg('API Key salva com sucesso!', 'success');
+    }
+
+    function changeN8nKey() {
+        localStorage.removeItem('mf_n8n_key');
+        n8nApiKey = '';
+        renderN8nKeyUI();
+        updateAutoUI(null);
+    }
+
+    function renderN8nKeyUI() {
+        const row = document.getElementById('n8nKeyRow');
+        if (n8nApiKey) {
+            const masked = n8nApiKey.substring(0, 8) + '...' + n8nApiKey.slice(-4);
+            row.innerHTML = '<div class="auto-key-saved">&#9989; Key configurada: <code>' + masked + '</code> <button onclick="changeN8nKey()">alterar</button></div>';
+        } else {
+            row.innerHTML = '<div class="form-group" style="margin-bottom:0;flex:1"><label style="font-size:.75rem">API Key n8n</label><div style="display:flex;gap:6px"><input type="password" id="n8nKeyInput" placeholder="n8n_api_xxxxxxxxxxxx" style="flex:1;padding:8px 10px;font-size:.8rem"><button class="auto-btn" onclick="saveN8nKey()" style="white-space:nowrap">Salvar Key</button></div></div>';
+        }
+    }
+
     function showAutoMsg(text, type) {
         const el = document.getElementById('autoMsg');
         el.textContent = text;
@@ -492,6 +534,7 @@
         if (!n8nApiKey) {
             n8nApiKey = localStorage.getItem('mf_n8n_key') || '';
         }
+        renderN8nKeyUI();
         checkWorkflowStatus();
     }
 
