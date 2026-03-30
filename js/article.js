@@ -3,7 +3,8 @@
   'use strict';
 
   const BASE_URL = 'https://mundoflownoticias.com.br/';
-  const DATA_URL = 'data/articles.json';
+  const DATA_URL = 'https://raw.githubusercontent.com/renanmenesesadv/Portal-Mundo-Flow/main/data/articles.json';
+  const DATA_URL_FALLBACK = 'data/articles.json';
 
   const CATEGORIES = {
     tecnologia: 'Tecnologia',
@@ -56,15 +57,22 @@
   }
 
   async function loadArticles() {
+    let data;
     try {
       const resp = await fetch(DATA_URL + '?t=' + Date.now(), { cache: 'no-store' });
-      if (!resp.ok) throw new Error('Failed');
-      const data = await resp.json();
-      data.sort((a, b) => new Date(b.date) - new Date(a.date));
-      return data;
+      if (!resp.ok) throw new Error('GitHub raw failed');
+      data = await resp.json();
     } catch {
-      return [];
+      try {
+        const resp2 = await fetch(DATA_URL_FALLBACK + '?t=' + Date.now(), { cache: 'no-store' });
+        if (!resp2.ok) throw new Error('Fallback failed');
+        data = await resp2.json();
+      } catch {
+        return [];
+      }
     }
+    data.sort((a, b) => new Date(b.date) - new Date(a.date));
+    return data;
   }
 
   function renderArticle(article) {

@@ -3,10 +3,36 @@
     <channel>
         <title>Mundo Flow Notícias</title>
         <link>https://mundoflownoticias.com.br/</link>
-        <description>Portal de noticias nacionais e internacionais em tempo real</description>
+        <description>Portal de notícias nacionais e internacionais em tempo real</description>
         <language>pt-BR</language>
-        <lastBuildDate></lastBuildDate>
+        <lastBuildDate>Mon, 30 Mar 2026 12:11:46 +0000</lastBuildDate>
         <atom:link href="https://mundoflownoticias.com.br/feed.xml" rel="self" type="application/rss+xml"/>
-        <!-- Items are dynamically added by n8n workflow -->
+        <item>
+            <title>Lula e Flávio Bolsonaro Empatam na Corrida pelo Planalto em 2026</title>
+            <link>https://mundoflownoticias.com.br/artigo.html?id=lula-e-flavio-bolsonaro-empatam-na-corrida-pelo-planalto-em--mnd1p3er</link>
+            <description>Pesquisa Paraná Pesquisas mostra empate técnico entre Lula e Flávio Bolsonaro tanto no primeiro quanto no segundo turno das eleições 2026.</description>
+            <dc:creator>Renan Meneses</dc:creator>
+            <category>politica</category>
+            <pubDate>Mon, 30 Mar 2026 10:28:34 +0000</pubDate>
+            <guid isPermaLink="true">https://mundoflownoticias.com.br/artigo.html?id=lula-e-flavio-bolsonaro-empatam-na-corrida-pelo-planalto-em--mnd1p3er</guid>
+        </item>
+        <item>
+            <title>Malware em App Chinês Ameaça Milhões de Usuários no Brasil</title>
+            <link>https://mundoflownoticias.com.br/artigo.html?id=malware-em-app-chines-ameaca-milhoes-de-usuarios-no-brasil-mnd1ijrw</link>
+            <description>Aplicativos de compras chineses contêm malware que pode roubar dados pessoais e bancários de centenas de milhões de usuários no mundo.</description>
+            <dc:creator>Renan Meneses</dc:creator>
+            <category>tecnologia</category>
+            <pubDate>Mon, 30 Mar 2026 10:23:29 +0000</pubDate>
+            <guid isPermaLink="true">https://mundoflownoticias.com.br/artigo.html?id=malware-em-app-chines-ameaca-milhoes-de-usuarios-no-brasil-mnd1ijrw</guid>
+        </item>
+        <item>
+            <title>Programador do Ceará Fatura R$ 20 Milhões com Vagas no Exterior</title>
+            <link>https://mundoflownoticias.com.br/artigo.html?id=programador-do-ceara-fatura-r-20-milhoes-com-vagas-no-exteri-mnd1d9rx</link>
+            <description>Empreendedor cearense fatura R$ 20 milhões ajudando brasileiros a conseguir vagas internacionais com método inovador de preparação.</description>
+            <dc:creator>Renan Meneses</dc:creator>
+            <category>tecnologia</category>
+            <pubDate>Mon, 30 Mar 2026 10:19:22 +0000</pubDate>
+            <guid isPermaLink="true">https://mundoflownoticias.com.br/artigo.html?id=programador-do-ceara-fatura-r-20-milhoes-com-vagas-no-exteri-mnd1d9rx</guid>
+        </item>
     </channel>
 </rss>

@@ -56,5 +56,22 @@
         <changefreq>monthly</changefreq>
         <priority>0.4</priority>
     </url>
-    <!-- Dynamic article URLs are added by the n8n workflow -->
+    <url>
+        <loc>https://mundoflownoticias.com.br/artigo.html?id=lula-e-flavio-bolsonaro-empatam-na-corrida-pelo-planalto-em--mnd1p3er</loc>
+        <lastmod>2026-03-30</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://mundoflownoticias.com.br/artigo.html?id=malware-em-app-chines-ameaca-milhoes-de-usuarios-no-brasil-mnd1ijrw</loc>
+        <lastmod>2026-03-30</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://mundoflownoticias.com.br/artigo.html?id=programador-do-ceara-fatura-r-20-milhoes-com-vagas-no-exteri-mnd1d9rx</loc>
+        <lastmod>2026-03-30</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
 </urlset>

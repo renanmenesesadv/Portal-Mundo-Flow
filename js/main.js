@@ -4,7 +4,8 @@
 
   const CONFIG = {
     articlesPerPage: 12,
-    dataUrl: 'data/articles.json',
+    dataUrl: 'https://raw.githubusercontent.com/renanmenesesadv/Portal-Mundo-Flow/main/data/articles.json',
+    dataUrlFallback: 'data/articles.json',
     categories: {
       tecnologia: { name: 'Tecnologia', icon: '💻' },
       politica: { name: 'Política', icon: '🏛' },
@@ -72,15 +73,21 @@
   // ===== Data Loading =====
   async function loadArticles() {
     try {
-      const resp = await fetch(CONFIG.dataUrl + '?t=' + Date.now(), { cache: 'no-store' });
-      if (!resp.ok) throw new Error('Failed to load articles');
+      let resp = await fetch(CONFIG.dataUrl + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!resp.ok) throw new Error('GitHub raw failed');
       allArticles = await resp.json();
-      // Sort by date descending
-      allArticles.sort((a, b) => new Date(b.date) - new Date(a.date));
     } catch (e) {
-      console.warn('No articles yet:', e.message);
-      allArticles = [];
+      try {
+        const resp2 = await fetch(CONFIG.dataUrlFallback + '?t=' + Date.now(), { cache: 'no-store' });
+        if (!resp2.ok) throw new Error('Fallback failed');
+        allArticles = await resp2.json();
+      } catch (e2) {
+        console.warn('No articles:', e2.message);
+        allArticles = [];
+        return;
+      }
     }
+    allArticles.sort((a, b) => new Date(b.date) - new Date(a.date));
   }
 
   // ===== Render =====
